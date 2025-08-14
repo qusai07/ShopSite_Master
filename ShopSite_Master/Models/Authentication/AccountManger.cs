@@ -24,12 +24,7 @@ namespace MyShop_Site.Models.Authentication
     {
         public string Token{ get; set; }
     }
-    public class UserInfoResponseModel : IResponseModel
-    {
-        public Guid ID { get; set; }
-        public bool IsVerified { get; set; }
-        public bool IsActive { get; set; }
-    }
+ 
     public class VerifyUserModel : JsonRequestModel
     {
         public Guid ID { get; set; }

@@ -17,7 +17,6 @@ namespace MyShopSite.Startup
             services.AddRazorPages();
             services.AddServerSideBlazor();
             services.AddHttpClient();
-
             // API clients
             services.AddHttpClient("MasterAPI", client =>
             {
@@ -75,7 +74,6 @@ namespace MyShopSite.Startup
             // Master service
             services.AddScoped<MasterService>();
 
-            services.AddHttpContextAccessor();
 
             return services; 
             // return the IServiceCollection for chaining

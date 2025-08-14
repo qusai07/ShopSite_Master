@@ -1,4 +1,4 @@
-using Microsoft.AspNetCore.Components;
+﻿using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.Extensions.Logging;
 using MyShop_Site.Models.Authentication;
@@ -38,59 +38,38 @@ namespace MyShop_Site.Services
 
         public async Task<AuthenticationResult> AuthenticateAsync(string username, string password, bool rememberMe = false)
         {
-            try
-            {
-                var loginRequest = new LoginRequestModel
-                {
-                    Username = username,
-                    Password = password,
-                };
 
-                var response = await _masterService.RequestMasterAsync<LoginResponseModel>("Authentication/Authenticate", loginRequest);
+            var response = await _masterService.RequestMasterAsync<LoginResponseModel>(
+              "Authentication/Authenticate",
+              new LoginRequestModel { Username = username, Password = password });
 
-                if (response?.IsSuccess == true && !string.IsNullOrEmpty(response.Token))
-                {
-                    // Store token securely
-                    await _tokenService.SetTokenAsync(response.Token);
-
-                    // Update authentication state
-                    // This part assumes CustomAuthenticationStateProvider has a method to set the token and authenticate
-                    // If it relies on ClaimsPrincipal, we might need to create one from the token.
-                    // For now, assuming it can handle the token directly for authentication state.
-                    await _authStateProvider.MarkUserAsAuthenticatedAsync(response.Token);
-
-                    return new AuthenticationResult
-                    {
-                        IsSuccess = true,
-                        Message = "Authentication successful",
-                        Token = response.Token,
-                        // TokenExpiry should ideally be parsed from the JWT itself
-                        TokenExpiry = DateTime.UtcNow.AddHours(1)
-                    };
-                }
-
+            if (!response.IsSuccess || string.IsNullOrEmpty(response.Token))
                 return new AuthenticationResult
                 {
                     IsSuccess = false,
                     Message = response?.Message ?? "Authentication failed"
                 };
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error during authentication");
-                return new AuthenticationResult
-                {
-                    IsSuccess = false,
-                    Message = "An error occurred during authentication"
-                };
-            }
-        }
 
-        public async Task<UserInfoResponseModel?> GetProfileAsync()
+            // ✅ تخزين التوكن وتحديث AuthenticationStateProvider
+            await _tokenService.SetTokenAsync(response.Token);
+            await _authStateProvider.MarkUserAsAuthenticatedAsync(response.Token);
+
+            return new AuthenticationResult
+            {
+                IsSuccess = true,
+                Message = "Login successful",
+                Token = response.Token
+            };
+
+        }
+     
+
+
+        public async Task<UserInfoResponseModel> GetProfileAsync()
         {
             try
             {
-                var response = await _apiClient.GetAsync<UserInfoResponseModel>("User/GetUser");
+                var response = await _masterService.RequestMasterAsync<UserInfoResponseModel>("User/GetUser");
                 return response;
             }
             catch (Exception ex)
@@ -124,6 +103,7 @@ namespace MyShop_Site.Services
             var authState = await _authStateProvider.GetAuthenticationStateAsync();
             return authState.User.Identity?.IsAuthenticated == true;
         }
+
 
         public async Task<string> GetCurrentUserIdAsync()
         {

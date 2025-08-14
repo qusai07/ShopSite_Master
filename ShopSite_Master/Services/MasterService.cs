@@ -27,12 +27,12 @@ namespace MyShop_Site.Services
             _configuration = configuration;
             _logger = logger;
             MasterBaseUrl = _configuration["MasterAPI:BaseUrl"] ?? "http://192.168.0.15/ShopMaster";
-            //var token = _cookieService("AuthToken");
-            //if (!string.IsNullOrEmpty(token))
-            //{
-            //    _authToken = token;
-            //    _tokenExpiry = DateTime.UtcNow.AddHours(1);
-            //}
+            var token = GetToken();
+            if (!string.IsNullOrEmpty(token))
+            {
+                _authToken = token;
+                _tokenExpiry = DateTime.UtcNow.AddHours(1);
+            }
 
         }
 
@@ -62,7 +62,7 @@ namespace MyShop_Site.Services
 
                 using var request = new HttpRequestMessage(HttpMethod.Post, $"{MasterBaseUrl}/api/{operation}");
 
-                if (!string.IsNullOrEmpty(_authToken) && !isRetry)
+                if (!string.IsNullOrEmpty(_authToken)) // && !isRetry)
                 {
                     request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", _authToken);
                 }

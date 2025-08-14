@@ -1,4 +1,4 @@
-
+﻿
 using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage;
 using Microsoft.AspNetCore.DataProtection;
 using System.IdentityModel.Tokens.Jwt;
@@ -34,17 +34,14 @@ namespace MyShop_Site.Services
                 }
 
                 // Parse token to get expiry
-                var handler = new JwtSecurityTokenHandler();
-                var jsonToken = handler.ReadJwtToken(token);
-                var expiry = jsonToken.ValidTo;
-
-                // Encrypt and store token
                 var protectedToken = _dataProtector.Protect(token);
-                await _protectedStorage.SetAsync(TOKEN_KEY, protectedToken);
-                await _protectedStorage.SetAsync(TOKEN_EXPIRY_KEY, expiry.ToString("O"));
+                await _protectedStorage.SetAsync(TOKEN_KEY, _dataProtector.Protect(token));
+                // For opaque tokens, you cannot read expiry from token
+                await _protectedStorage.SetAsync(TOKEN_EXPIRY_KEY, DateTime.UtcNow.AddHours(1).ToString("O"));
 
-                // Set secure HTTP-only cookie as backup
-           //     SetSecureCookie(token, expiry);
+           
+                //Set secure HTTP - only cookie as backup
+                //SetSecureCookie(token, expiry);
 
                 _logger.LogInformation("JWT token stored securely");
             }
@@ -59,39 +56,56 @@ namespace MyShop_Site.Services
         {
             try
             {
-                // First try to get from ProtectedSessionStorage
                 var result = await _protectedStorage.GetAsync<string>(TOKEN_KEY);
-                if (result.Success && !string.IsNullOrEmpty(result.Value))
-                {
-                    var token = _dataProtector.Unprotect(result.Value);
-                    
-                    // Check if token is still valid
-                    if (await IsTokenValidInternalAsync(token))
+                if (!result.Success || string.IsNullOrEmpty(result.Value))
+                    return null;
+
+                var token = _dataProtector.Unprotect(result.Value);
+                try
+                { 
+                    if (token.Count(c => c == '.') != 2)
                     {
-                        return token;
+                        _logger.LogWarning("Token is not a valid JWT format.");
+                        await DeleteTokenAsync();
+                        return null;
                     }
+
+                    return token;
                 }
-
-                // If not found or invalid, try to get from cookie
-                //var cookieToken = GetTokenFromCookie();
-                //if (!string.IsNullOrEmpty(cookieToken) && await IsTokenValidInternalAsync(cookieToken))
-                //{
-                //    // Restore to session storage
-                //    await SetTokenAsync(cookieToken);
-                //    return cookieToken;
-                //}
-
-                // Token not found or invalid
-                await DeleteTokenAsync();
-                return null;
+                catch (Exception ex)
+                {
+                    _logger.LogWarning(ex, "Token is malformed or not JWT.");
+                    await DeleteTokenAsync();
+                    return null;
+                }
             }
             catch (Exception ex)
             {
-                _logger.LogWarning(ex, "Error retrieving JWT token");
+                _logger.LogWarning(ex, "Error retrieving token from session storage.");
                 await DeleteTokenAsync();
                 return null;
             }
         }
+
+
+
+        //private string GetTokenFromCookie()
+        //{
+        //    try
+        //    {
+        //        var httpContext = _httpContextAccessor.HttpContext;
+        //        if (httpContext?.Request.Cookies.TryGetValue("auth_token", out var cookieValue) == true)
+        //        {
+        //            return cookieValue;
+        //        }
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        _logger.LogWarning(ex, "Error reading token from cookie");
+        //    }
+        //    return null;
+        //}
+
 
         public async Task DeleteTokenAsync()
         {
@@ -158,22 +172,7 @@ namespace MyShop_Site.Services
         //    }
         //}
 
-        //private string? GetTokenFromCookie()
-        //{
-        //    try
-        //    {
-        //        var httpContext = _httpContextAccessor.HttpContext;
-        //        if (httpContext?.Request.Cookies.TryGetValue("auth_token", out var cookieValue) == true)
-        //        {
-        //            return _dataProtector.Unprotect(cookieValue);
-        //        }
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        _logger.LogWarning(ex, "Error reading token from cookie");
-        //    }
-        //    return null;
-        //}
+   
 
         //private void ClearSecureCookie()
         //{

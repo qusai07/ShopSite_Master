@@ -32,7 +32,6 @@ namespace MyShopSite.Startup
         }
     }
 }
-using Microsoft.AspNetCore.Builder;
 
 namespace MyShopSite.Startup
 {

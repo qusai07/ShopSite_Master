@@ -62,4 +62,5 @@ namespace MyShop_Site.Models.Common
         [Range(typeof(bool), "true", "true", ErrorMessage = "You must accept the terms and conditions")]
         public bool AcceptTerms { get; set; }
     }
+
 }

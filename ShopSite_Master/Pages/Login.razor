@@ -81,7 +81,7 @@
             var result = await AuthService.AuthenticateAsync(loginModel.Username, loginModel.Password, false);
             if (result.IsSuccess)
             {
-                Navigation.NavigateTo("/");
+                Navigation.NavigateTo("/profile");
             }
             else
             {
