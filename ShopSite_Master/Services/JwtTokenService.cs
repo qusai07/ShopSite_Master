@@ -1,10 +1,7 @@
 
 using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage;
 using Microsoft.AspNetCore.DataProtection;
-using Microsoft.Extensions.Logging;
-using System;
 using System.IdentityModel.Tokens.Jwt;
-using System.Threading.Tasks;
 
 namespace MyShop_Site.Services
 {
@@ -13,20 +10,17 @@ namespace MyShop_Site.Services
         private readonly ProtectedSessionStorage _protectedStorage;
         private readonly IDataProtector _dataProtector;
         private readonly ILogger<JwtTokenService> _logger;
-        private readonly IHttpContextAccessor _httpContextAccessor;
         private const string TOKEN_KEY = "jwt_token";
         private const string TOKEN_EXPIRY_KEY = "jwt_token_expiry";
 
         public JwtTokenService(
             ProtectedSessionStorage protectedStorage,
             IDataProtectionProvider dataProtectionProvider,
-            ILogger<JwtTokenService> logger,
-            IHttpContextAccessor httpContextAccessor)
+            ILogger<JwtTokenService> logger)
         {
             _protectedStorage = protectedStorage;
             _dataProtector = dataProtectionProvider.CreateProtector("MyShop.JwtTokens");
             _logger = logger;
-            _httpContextAccessor = httpContextAccessor;
         }
 
         public async Task SetTokenAsync(string token)
@@ -50,7 +44,7 @@ namespace MyShop_Site.Services
                 await _protectedStorage.SetAsync(TOKEN_EXPIRY_KEY, expiry.ToString("O"));
 
                 // Set secure HTTP-only cookie as backup
-                SetSecureCookie(token, expiry);
+           //     SetSecureCookie(token, expiry);
 
                 _logger.LogInformation("JWT token stored securely");
             }
@@ -79,13 +73,13 @@ namespace MyShop_Site.Services
                 }
 
                 // If not found or invalid, try to get from cookie
-                var cookieToken = GetTokenFromCookie();
-                if (!string.IsNullOrEmpty(cookieToken) && await IsTokenValidInternalAsync(cookieToken))
-                {
-                    // Restore to session storage
-                    await SetTokenAsync(cookieToken);
-                    return cookieToken;
-                }
+                //var cookieToken = GetTokenFromCookie();
+                //if (!string.IsNullOrEmpty(cookieToken) && await IsTokenValidInternalAsync(cookieToken))
+                //{
+                //    // Restore to session storage
+                //    await SetTokenAsync(cookieToken);
+                //    return cookieToken;
+                //}
 
                 // Token not found or invalid
                 await DeleteTokenAsync();
@@ -105,7 +99,6 @@ namespace MyShop_Site.Services
             {
                 await _protectedStorage.DeleteAsync(TOKEN_KEY);
                 await _protectedStorage.DeleteAsync(TOKEN_EXPIRY_KEY);
-                ClearSecureCookie();
                 _logger.LogInformation("JWT token cleared");
             }
             catch (Exception ex)
@@ -139,69 +132,69 @@ namespace MyShop_Site.Services
             }
         }
 
-        private void SetSecureCookie(string token, DateTime expiry)
-        {
-            try
-            {
-                var httpContext = _httpContextAccessor.HttpContext;
-                if (httpContext != null)
-                {
-                    var protectedToken = _dataProtector.Protect(token);
-                    var options = new CookieOptions
-                    {
-                        HttpOnly = true,
-                        Secure = true,
-                        SameSite = SameSiteMode.Strict,
-                        Expires = expiry,
-                        Path = "/"
-                    };
+        //private void SetSecureCookie(string token, DateTime expiry)
+        //{
+        //    try
+        //    {
+        //        var httpContext = _httpContextAccessor.HttpContext;
+        //        if (httpContext != null)
+        //        {
+        //            var protectedToken = _dataProtector.Protect(token);
+        //            var options = new CookieOptions
+        //            {
+        //                HttpOnly = true,
+        //                Secure = true,
+        //                SameSite = SameSiteMode.Strict,
+        //                Expires = expiry,
+        //                Path = "/"
+        //            };
 
-                    httpContext.Response.Cookies.Append("auth_token", protectedToken, options);
-                }
-            }
-            catch (Exception ex)
-            {
-                _logger.LogWarning(ex, "Error setting secure cookie");
-            }
-        }
+        //            httpContext.Response.Cookies.Append("auth_token", protectedToken, options);
+        //        }
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        _logger.LogWarning(ex, "Error setting secure cookie");
+        //    }
+        //}
 
-        private string? GetTokenFromCookie()
-        {
-            try
-            {
-                var httpContext = _httpContextAccessor.HttpContext;
-                if (httpContext?.Request.Cookies.TryGetValue("auth_token", out var cookieValue) == true)
-                {
-                    return _dataProtector.Unprotect(cookieValue);
-                }
-            }
-            catch (Exception ex)
-            {
-                _logger.LogWarning(ex, "Error reading token from cookie");
-            }
-            return null;
-        }
+        //private string? GetTokenFromCookie()
+        //{
+        //    try
+        //    {
+        //        var httpContext = _httpContextAccessor.HttpContext;
+        //        if (httpContext?.Request.Cookies.TryGetValue("auth_token", out var cookieValue) == true)
+        //        {
+        //            return _dataProtector.Unprotect(cookieValue);
+        //        }
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        _logger.LogWarning(ex, "Error reading token from cookie");
+        //    }
+        //    return null;
+        //}
 
-        private void ClearSecureCookie()
-        {
-            try
-            {
-                var httpContext = _httpContextAccessor.HttpContext;
-                if (httpContext != null)
-                {
-                    httpContext.Response.Cookies.Delete("auth_token", new CookieOptions
-                    {
-                        HttpOnly = true,
-                        Secure = true,
-                        SameSite = SameSiteMode.Strict,
-                        Path = "/"
-                    });
-                }
-            }
-            catch (Exception ex)
-            {
-                _logger.LogWarning(ex, "Error clearing secure cookie");
-            }
-        }
+        //private void ClearSecureCookie()
+        //{
+        //    try
+        //    {
+        //        var httpContext = _httpContextAccessor.HttpContext;
+        //        if (httpContext != null)
+        //        {
+        //            httpContext.Response.Cookies.Delete("auth_token", new CookieOptions
+        //            {
+        //                HttpOnly = true,
+        //                Secure = true,
+        //                SameSite = SameSiteMode.Strict,
+        //                Path = "/"
+        //            });
+        //        }
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        _logger.LogWarning(ex, "Error clearing secure cookie");
+        //    }
+        //}
     }
 }

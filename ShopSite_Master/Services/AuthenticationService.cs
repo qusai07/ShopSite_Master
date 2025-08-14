@@ -24,32 +24,34 @@ namespace MyShop_Site.Services
         private readonly CustomAuthenticationStateProvider _authStateProvider;
         private readonly NavigationManager _navigationManager;
         private readonly ILogger<AuthenticationService> _logger;
+        private readonly MasterService _masterService;
 
         public AuthenticationService(
             IApiClient apiClient,
             IJwtTokenService tokenService,
             CustomAuthenticationStateProvider authStateProvider,
             NavigationManager navigationManager,
-            ILogger<AuthenticationService> logger)
+            ILogger<AuthenticationService> logger, MasterService masterService)
         {
             _apiClient = apiClient;
             _tokenService = tokenService;
             _authStateProvider = authStateProvider;
             _navigationManager = navigationManager;
             _logger = logger;
+            _masterService = masterService;
         }
 
         public async Task<AuthenticationResult> AuthenticateAsync(string username, string password, bool rememberMe = false)
         {
             try
             {
-                var loginRequest = new LoginRequestModel
+                LoginRequestModel loginRequest = new ()
                 {
                     Username = username,
                     Password = password,
                 };
 
-                var response = await _apiClient.PostAsync<LoginResponseModel>("Authentication/Authenticate", loginRequest);
+                var response = await _masterService.RequestMasterAsync<LoginResponseModel>("Authentication/Authenticate", loginRequest);
 
                 if (response?.IsSuccess == true && !string.IsNullOrEmpty(response.Token))
                 {
@@ -108,7 +110,7 @@ namespace MyShop_Site.Services
             try
             {
                 // Clear token from the token service
-                await _tokenService.ClearTokenAsync(); // Assuming IJwtTokenService has a ClearTokenAsync method
+                await _tokenService.DeleteTokenAsync();
 
                 // Update authentication state
                 await _authStateProvider.MarkUserAsLoggedOutAsync();

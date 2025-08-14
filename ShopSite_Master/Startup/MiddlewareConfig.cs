@@ -1,8 +1,8 @@
 ﻿namespace MyShopSite.Startup
 {
-    public static class MiddlewareConfig
+    public static class MiddlewareExtensions
     {
-        public static void UseGlobalMiddleware(this WebApplication app)
+        public static WebApplication UseMyShopMiddleware(this WebApplication app)
         {
             app.UseCors("AllowLocalNetwork");
 
@@ -18,9 +18,17 @@
             }
             else
             {
-                app.UseExceptionHandler("/Error");
+                app.UseMiddleware<MyShopSite.Middleware.ExceptionMiddleware>();
                 app.UseHsts();
             }
+
+            app.UseHttpsRedirection();
+            app.UseStaticFiles();
+            app.UseRouting();
+            app.UseAuthentication();
+            app.UseAuthorization();
+
+            return app;
         }
     }
-} 
+}

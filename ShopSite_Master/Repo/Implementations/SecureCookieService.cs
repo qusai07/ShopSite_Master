@@ -39,7 +39,7 @@ namespace MyShop_Site.Repo.Implementations
                 Expires = DateTime.UtcNow.AddMinutes(expireMinutes)
             };
 
-            _httpContextAccessor.HttpContext.Response.Cookies.Append("AuthToken", token, options);
+            //_httpContextAccessor.HttpContext.Response.Cookies.Append("AuthToken", token, options);
         }
         public async Task SetSecureCookie(string key, string value)
         {
