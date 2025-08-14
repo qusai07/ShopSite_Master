@@ -1,0 +1,212 @@
+@page "/profile"
+@inject Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage.ProtectedSessionStorage ProtectedSessionStorage
+@inject NavigationManager NavigationManager
+@inject IAuthenticationService AuthService
+@inject ILogger<Profile> Logger
+@using MyShop_Site.Services
+@using MyShop_Site.Models.ResponseModels
+
+<PageTitle>Profile - MyShop</PageTitle>
+
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow">
+                <div class="card-header bg-primary text-white">
+                    <h3 class="mb-0">
+                        <i class="fas fa-user-circle me-2"></i>
+                        User Profile
+                    </h3>
+                </div>
+                <div class="card-body">
+                    @if (isLoading)
+                    {
+                        <div class="text-center py-5">
+                            <div class="spinner-border text-primary" role="status">
+                                <span class="visually-hidden">Loading...</span>
+                            </div>
+                            <p class="mt-3 text-muted">Loading your profile...</p>
+                        </div>
+                    }
+                    else if (isAuthenticated && userInfo != null)
+                    {
+                        <div class="row">
+                            <div class="col-md-8">
+                                <h5 class="text-primary mb-3">Welcome back!</h5>
+
+                                <div class="mb-3">
+                                    <label class="form-label fw-bold">Username:</label>
+                                    <p class="form-control-plaintext">@userInfo.UserName</p>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label class="form-label fw-bold">Email:</label>
+                                    <p class="form-control-plaintext">@userInfo.EmailAddress</p>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label class="form-label fw-bold">Company:</label>
+                                    <p class="form-control-plaintext">@userInfo.CompanyName</p>
+                                </div>
+
+                                @if (!string.IsNullOrEmpty(loginTime))
+                                {
+                                    <div class="mb-3">
+                                        <label class="form-label fw-bold">Session Started:</label>
+                                        <p class="form-control-plaintext text-muted">@loginTime</p>
+                                    </div>
+                                }
+                            </div>
+                            <div class="col-md-4">
+                                <div class="text-center">
+                                    <div class="bg-primary rounded-circle d-inline-flex align-items-center justify-content-center" style="width: 100px; height: 100px;">
+                                        <i class="fas fa-user text-white" style="font-size: 40px;"></i>
+                                    </div>
+                                    <h6 class="mt-3">@userInfo.UserName</h6>
+                                </div>
+                            </div>
+                        </div>
+
+                        <hr class="my-4">
+
+                        <div class="d-flex gap-2">
+                            <button class="btn btn-danger" @onclick="Logout" disabled="@isLoggingOut">
+                                @if (isLoggingOut)
+                                {
+                                    <span class="spinner-border spinner-border-sm me-2">Signing out...</span> 
+                                                }
+                                else
+                                {
+                            <i class="fas fa-sign-out-alt me-2">Logout</i>
+                                                }
+                            </button>
+
+                            <button class="btn btn-outline-primary" @onclick="RefreshData" disabled="@isRefreshing">
+                                @if (isRefreshing)
+                                {
+                                    <span class="spinner-border spinner-border-sm me-2">Refreshing...</span> 
+                                                }
+                                else
+                                {
+                            <i class="fas fa-sync-alt me-2">Refresh Data</i>
+                                                }
+                            </button>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="alert alert-warning">
+                            <i class="fas fa-exclamation-triangle me-2"></i>
+                            <strong>Access Denied</strong>
+                            <p>You are not authenticated. Please login to access this page.</p>
+                            <a href="/login" class="btn btn-primary">
+                                <i class="fas fa-sign-in-alt me-2"></i> Go to Login
+                            </a>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+    private bool isLoading = true;
+    private bool isLoggingOut = false;
+    private bool isRefreshing = false;
+    private bool isAuthenticated = false;
+    private string loginTime = string.Empty;
+    private UserInfoResponseModel? userInfo;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadProfileData();
+    }
+
+    private async Task LoadProfileData()
+    {
+        try
+        {
+            isLoading = true;
+            isAuthenticated = await AuthService.IsAuthenticatedAsync();
+
+            if (!isAuthenticated)
+            {
+                NavigationManager.NavigateTo("/login");
+                return;
+            }
+
+            // Get login time
+            var loginTimeResult = await ProtectedSessionStorage.GetAsync<string>("login_time");
+            if (loginTimeResult.Success && !string.IsNullOrEmpty(loginTimeResult.Value))
+            {
+                if (DateTime.TryParse(loginTimeResult.Value, out var parsedTime))
+                {
+                    loginTime = parsedTime.ToString("yyyy-MM-dd HH:mm:ss UTC");
+                }
+            }
+
+            // Get user info
+            var userInfoResult = await ProtectedSessionStorage.GetAsync<UserInfoResponseModel>("user_info");
+            if (userInfoResult.Success)
+            {
+                userInfo = userInfoResult.Value;
+            }
+
+            // If not found in session, load from API
+            if (userInfo == null)
+            {
+                userInfo = await AuthService.GetCurrentUserAsync();
+                if (userInfo != null)
+                {
+                    await ProtectedSessionStorage.SetAsync("user_info", userInfo);
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex, "Error loading profile data");
+            isAuthenticated = false;
+        }
+        finally
+        {
+            isLoading = false;
+            StateHasChanged();
+        }
+    }
+
+    private async Task Logout()
+    {
+        isLoggingOut = true;
+        StateHasChanged();
+
+        try
+        {
+            await AuthService.LogoutAsync();
+            await ProtectedSessionStorage.DeleteAsync("login_time");
+            await ProtectedSessionStorage.DeleteAsync("user_info");
+
+            NavigationManager.NavigateTo("/login", forceLoad: true);
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex, "Error during logout");
+        }
+        finally
+        {
+            isLoggingOut = false;
+            StateHasChanged();
+        }
+    }
+
+    private async Task RefreshData()
+    {
+        isRefreshing = true;
+        StateHasChanged();
+
+        await LoadProfileData();
+
+        isRefreshing = false;
+        StateHasChanged();
+    }
+}

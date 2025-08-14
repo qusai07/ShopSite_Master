@@ -1,0 +1,60 @@
+
+@using Microsoft.AspNetCore.Components.Web
+@using ShopSite_Master.Components.Navigation
+@namespace MyShop_Site.Shared
+@inherits LayoutComponentBase
+
+<div class="page">
+    <MainNavigation />
+    
+    <main class="main-content">
+        @Body
+    </main>
+    
+    <footer class="footer btn-primary text-light py-4 mt-5">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-4">
+                    <h5>MyShop</h5>
+                    <p>Your trusted partner for hardware, products, and applications.</p>
+                </div>
+                <div class="col-md-4">
+                    <h6>Quick Links</h6>
+                    <ul class="list-unstyled">
+                        <li><a href="/products" class="text-light">Products</a></li>
+                        <li><a href="/pricing" class="text-light">Pricing</a></li>
+                        <li><a href="/support" class="text-light">Support</a></li>
+                    </ul>
+                </div>
+                <div class="col-md-4">
+                    <h6>Contact</h6>
+                    <p>Email: info@myshop.com<br>Phone: +1 (555) 123-4567</p>
+                </div>
+            </div>
+            <hr class="my-3">
+            <div class="text-center">
+                <small>&copy; @DateTime.Now.Year MyShop. All rights reserved.</small>
+            </div>
+        </div>
+    </footer>
+</div>
+
+<style>
+    .page {
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .main-content {
+        flex: 1;
+    }
+
+    .footer a {
+        text-decoration: none;
+    }
+    
+    .footer a:hover {
+        text-decoration: underline;
+    }
+</style>

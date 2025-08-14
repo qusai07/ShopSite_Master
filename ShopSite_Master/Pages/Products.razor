@@ -1,0 +1,143 @@
+
+@page "/products"
+@page "/products/{category?}"
+
+<PageTitle>Products - MyShop</PageTitle>
+
+<div class="container py-5">
+    <div class="row">
+        <!-- Sidebar Filters -->
+        <aside class="col-lg-3 mb-4">
+            <div class="card shadow-sm border-0">
+                <div class="card-header bg-dark text-white">
+                    <h6 class="mb-0"><i class="fas fa-filter me-2"></i>Filter by Category</h6>
+                </div>
+                <div class="list-group list-group-flush">
+                    @foreach (var item in new[] { "All", "hardware", "products", "apps" })
+                    {
+                        <a href="/products/@(item == "All" ? "" : item)"
+                           class="list-group-item list-group-item-action @(Category == item.ToLower() || (string.IsNullOrEmpty(Category) && item == "All") ? "active" : "")">
+                            <i class="fas @(GetCategoryIcon(item)) me-2 text-muted"></i> @Cap(item)
+                        </a>
+                    }
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <section class="col-lg-9">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <h2 class="fw-bold">@GetCategoryTitle()</h2>
+                    <p class="text-muted small mb-0">@GetCategoryDescription()</p>
+                </div>
+                <div style="width: 200px;">
+                    <select class="form-select form-select-sm">
+                        <option>Sort by: Popular</option>
+                        <option>Price: Low to High</option>
+                        <option>Price: High to Low</option>
+                        <option>Name: A to Z</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="row g-4">
+                @foreach (var product in GetFilteredProducts())
+                {
+                    <div class="col-md-6 col-lg-4">
+                        <div class="card h-100 shadow-sm border-0">
+                            <div class="card-body d-flex flex-column">
+                                <div class="text-center mb-3">
+                                    <div class="bg-@GetCategoryColor(product.Category) bg-opacity-10 rounded-circle d-inline-flex align-items-center justify-content-center"
+                                         style="width: 70px; height: 70px;">
+                                        <i class="fas fa-@GetCategoryIcon(product.Category) fa-2x text-@GetCategoryColor(product.Category)"></i>
+                                    </div>
+                                </div>
+                                <h5 class="fw-bold text-center">@product.Name</h5>
+                                <p class="text-muted small text-center">@product.Description</p>
+                                <div class="d-flex justify-content-between align-items-center mt-auto">
+                                    <span class="badge bg-@GetCategoryColor(product.Category)">@product.Category</span>
+                                    <span class="fw-bold text-primary">$@product.Price/mo</span>
+                                </div>
+                                <a class="btn btn-outline-primary w-100 mt-3" href="/product/@product.Id">
+                                    <i class="fas fa-eye me-2"></i> View Details
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+        </section>
+    </div>
+</div>
+
+
+@code {
+    [Parameter] public string? Category { get; set; }
+
+    private string GetCategoryTitle()
+    {
+        return Category switch
+        {
+            "hardware" => "Hardware Solutions",
+            "products" => "Business Products",
+            "apps" => "Applications",
+            _ => "All Products"
+        };
+    }
+
+    private string GetCategoryDescription()
+    {
+        return Category switch
+        {
+            "hardware" => "Enterprise-grade servers, networking equipment, and infrastructure solutions",
+            "products" => "Business management tools, software solutions, and productivity suites",
+            "apps" => "Mobile applications, web platforms, and custom software solutions",
+            _ => "Browse our complete catalog of hardware, products, and applications"
+        };
+    }
+
+    private List<ProductDto> GetFilteredProducts()
+    {
+        var allProducts = new List<ProductDto>
+    {
+            new() { Id = 1, Name = "Enterprise Server Pro", Category = "Hardware", Description = "High-performance server for enterprise workloads", Price = 299 },
+            new() { Id = 2, Name = "Business CRM Suite", Category = "Products", Description = "Complete customer relationship management platform", Price = 49 },
+            new() { Id = 3, Name = "Mobile Analytics App", Category = "Apps", Description = "Real-time mobile analytics and reporting", Price = 19 },
+            new() { Id = 4, Name = "Network Security Hub", Category = "Hardware", Description = "Advanced firewall and security appliance", Price = 199 },
+            new() { Id = 5, Name = "Project Management Pro", Category = "Products", Description = "Comprehensive project management software", Price = 29 },
+            new() { Id = 6, Name = "E-commerce Platform", Category = "Apps", Description = "Full-featured online store application", Price = 79 }
+        };
+
+        if (string.IsNullOrEmpty(Category))
+            return allProducts;
+
+        return allProducts.Where(p => p.Category.Equals(Category, StringComparison.OrdinalIgnoreCase)).ToList();
+    }
+
+    private string GetCategoryColor(string category) => category.ToLower() switch
+    {
+        "hardware" => "primary",
+        "products" => "success",
+        "apps" => "info",
+        _ => "secondary"
+    };
+    private string GetCategoryIcon(string category) => category.ToLower() switch
+    {
+        "hardware" => "server",
+        "products" => "box",
+        "apps" => "mobile-alt",
+        _ => "th"
+    };
+    private string Cap(string? s) => string.IsNullOrEmpty(s) ? "All" : char.ToUpper(s[0]) + s[1..].ToLower();
+
+
+    public class ProductDto
+    {
+        public int Id { get; set; }
+        public string Name { get; set; } = "";
+        public string Category { get; set; } = "";
+        public string Description { get; set; } = "";
+        public decimal Price { get; set; }
+    }
+}

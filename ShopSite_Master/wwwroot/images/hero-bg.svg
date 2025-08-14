@@ -1,0 +1,72 @@
+
+<svg width="1920" height="1080" viewBox="0 0 1920 1080" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bg-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#667eea;stop-opacity:1" />
+      <stop offset="50%" style="stop-color:#764ba2;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#5a67d8;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="shape-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#ffffff;stop-opacity:0.1" />
+      <stop offset="100%" style="stop-color:#ffffff;stop-opacity:0.05" />
+    </linearGradient>
+  </defs>
+  
+  <!-- Background -->
+  <rect width="1920" height="1080" fill="url(#bg-gradient)"/>
+  
+  <!-- Geometric shapes -->
+  <circle cx="1600" cy="200" r="150" fill="url(#shape-gradient)" opacity="0.3"/>
+  <circle cx="1700" cy="350" r="100" fill="url(#shape-gradient)" opacity="0.2"/>
+  <circle cx="1500" cy="450" r="80" fill="url(#shape-gradient)" opacity="0.25"/>
+  
+  <polygon points="300,800 200,950 400,950" fill="url(#shape-gradient)" opacity="0.15"/>
+  <polygon points="1800,850 1700,1000 1900,1000" fill="url(#shape-gradient)" opacity="0.1"/>
+  
+  <!-- Tech-inspired grid pattern -->
+  <g opacity="0.05">
+    <path d="M0,0 L1920,0 L1920,1080 L0,1080 Z" fill="none" stroke="white" stroke-width="1"/>
+    <g stroke="white" stroke-width="0.5">
+      <path d="M0,108 L1920,108"/>
+      <path d="M0,216 L1920,216"/>
+      <path d="M0,324 L1920,324"/>
+      <path d="M0,432 L1920,432"/>
+      <path d="M0,540 L1920,540"/>
+      <path d="M0,648 L1920,648"/>
+      <path d="M0,756 L1920,756"/>
+      <path d="M0,864 L1920,864"/>
+      <path d="M0,972 L1920,972"/>
+      
+      <path d="M192,0 L192,1080"/>
+      <path d="M384,0 L384,1080"/>
+      <path d="M576,0 L576,1080"/>
+      <path d="M768,0 L768,1080"/>
+      <path d="M960,0 L960,1080"/>
+      <path d="M1152,0 L1152,1080"/>
+      <path d="M1344,0 L1344,1080"/>
+      <path d="M1536,0 L1536,1080"/>
+      <path d="M1728,0 L1728,1080"/>
+    </g>
+  </g>
+  
+  <!-- Abstract tech elements -->
+  <g opacity="0.1">
+    <rect x="1200" y="100" width="4" height="40" fill="white" transform="rotate(45 1202 120)"/>
+    <rect x="1250" y="150" width="4" height="60" fill="white" transform="rotate(-30 1252 180)"/>
+    <rect x="1300" y="80" width="4" height="35" fill="white" transform="rotate(60 1302 97)"/>
+    
+    <rect x="100" y="700" width="6" height="50" fill="white" transform="rotate(30 103 725)"/>
+    <rect x="150" y="750" width="6" height="70" fill="white" transform="rotate(-45 153 785)"/>
+    <rect x="200" y="680" width="6" height="40" fill="white" transform="rotate(75 203 700)"/>
+  </g>
+  
+  <!-- Floating particles -->
+  <g opacity="0.2">
+    <circle cx="800" cy="300" r="3" fill="white"/>
+    <circle cx="1100" cy="200" r="2" fill="white"/>
+    <circle cx="1400" cy="600" r="4" fill="white"/>
+    <circle cx="500" cy="500" r="2.5" fill="white"/>
+    <circle cx="1600" cy="800" r="3.5" fill="white"/>
+    <circle cx="300" cy="400" r="2" fill="white"/>
+  </g>
+</svg>

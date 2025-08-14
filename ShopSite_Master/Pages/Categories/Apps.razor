@@ -1,0 +1,218 @@
+
+@page "/Categories/apps"
+@inject ProductService ProductService
+@inject NavigationManager Navigation
+
+<PageTitle>Applications - MyShop</PageTitle>
+
+<div class="hero-section bg-gradient text-white">
+    <div class="container">
+        <div class="row align-items-center py-5">
+            <div class="col-lg-8 fade-in">
+                <div class="d-flex align-items-center mb-3">
+                    <div class="bg-white bg-opacity-20 rounded-circle p-3 me-3">
+                        <i class="fas fa-mobile-alt fa-2x text-white"></i>
+                    </div>
+                    <div>
+                        <h1 class="display-4 fw-bold mb-2">Applications</h1>
+                        <p class="lead mb-0">Modern apps for the digital workplace</p>
+                    </div>
+                </div>
+                <p class="fs-5 mb-4 opacity-75">
+                    Cutting-edge mobile applications, web platforms, and custom software solutions 
+                    built with the latest technologies for maximum performance and scalability.
+                </p>
+                <div class="d-flex align-items-center gap-4 text-white-50">
+                    <div class="d-flex align-items-center">
+                        <i class="fas fa-check-circle me-2 text-success"></i>
+                        <span>Cross-Platform</span>
+                    </div>
+                    <div class="d-flex align-items-center">
+                        <i class="fas fa-shield-alt me-2 text-success"></i>
+                        <span>Secure & Fast</span>
+                    </div>
+                    <div class="d-flex align-items-center">
+                        <i class="fas fa-sync me-2 text-success"></i>
+                        <span>Real-time Sync</span>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-4 text-center slide-in-right">
+                <div class="position-relative">
+                    <div class="bg-white bg-opacity-10 rounded-circle p-4 d-inline-block">
+                        <i class="fas fa-code fa-6x text-white opacity-75"></i>
+                    </div>
+                    <div class="position-absolute top-0 start-0 w-100 h-100">
+                        <div class="floating-elements">
+                            <i class="fas fa-mobile-alt floating-icon"></i>
+                            <i class="fas fa-laptop-code floating-icon"></i>
+                            <i class="fas fa-cloud floating-icon"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<section class="py-5 bg-light">
+    <div class="container">
+        <div class="row mb-5">
+            <div class="col-12 text-center">
+                <h2 class="display-5 fw-bold section-title mb-4">Application Types</h2>
+                <p class="lead text-muted col-lg-8 mx-auto">
+                    From mobile apps to enterprise platforms, we've got you covered
+                </p>
+            </div>
+        </div>
+        
+        <div class="row g-4 mb-5">
+            <div class="col-lg-3 col-md-6">
+                <div class="card h-100 border-0 shadow-sm">
+                    <div class="card-body text-center p-4">
+                        <div class="bg-info bg-opacity-10 rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 70px; height: 70px;">
+                            <i class="fas fa-mobile-alt fa-2x text-info"></i>
+                        </div>
+                        <h5 class="fw-bold">Mobile Apps</h5>
+                        <p class="text-muted small">iOS and Android native applications</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6">
+                <div class="card h-100 border-0 shadow-sm">
+                    <div class="card-body text-center p-4">
+                        <div class="bg-primary bg-opacity-10 rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 70px; height: 70px;">
+                            <i class="fas fa-globe fa-2x text-primary"></i>
+                        </div>
+                        <h5 class="fw-bold">Web Platforms</h5>
+                        <p class="text-muted small">Progressive web applications and portals</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6">
+                <div class="card h-100 border-0 shadow-sm">
+                    <div class="card-body text-center p-4">
+                        <div class="bg-success bg-opacity-10 rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 70px; height: 70px;">
+                            <i class="fas fa-cogs fa-2x text-success"></i>
+                        </div>
+                        <h5 class="fw-bold">Custom Software</h5>
+                        <p class="text-muted small">Tailored solutions for specific needs</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6">
+                <div class="card h-100 border-0 shadow-sm">
+                    <div class="card-body text-center p-4">
+                        <div class="bg-warning bg-opacity-10 rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 70px; height: 70px;">
+                            <i class="fas fa-plug fa-2x text-warning"></i>
+                        </div>
+                        <h5 class="fw-bold">API Solutions</h5>
+                        <p class="text-muted small">Integration and automation platforms</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="py-5">
+    <div class="container">
+        <div class="row mb-5">
+            <div class="col-12 text-center">
+                <h2 class="display-5 fw-bold section-title mb-4">Featured Applications</h2>
+                <p class="lead text-muted col-lg-8 mx-auto">
+                    Innovative applications designed to boost productivity and efficiency
+                </p>
+            </div>
+        </div>
+
+        <div class="row g-4">
+            @{
+                var apps = new[]
+                {
+                    new { Name = "WorkFlow Mobile", Icon = "fas fa-tasks", Price = 99, Description = "Powerful mobile app for task management and team collaboration on the go.", Platform = "iOS & Android" },
+                    new { Name = "DataSync Platform", Icon = "fas fa-sync-alt", Price = 299, Description = "Real-time data synchronization platform with advanced analytics and reporting.", Platform = "Web Platform" },
+                    new { Name = "CustomBuild Pro", Icon = "fas fa-hammer", Price = 599, Description = "Custom software development platform with drag-and-drop interface builder.", Platform = "Desktop & Web" },
+                    new { Name = "API Gateway Plus", Icon = "fas fa-network-wired", Price = 199, Description = "Enterprise API management platform with security and monitoring features.", Platform = "Cloud Service" },
+                    new { Name = "Mobile Commerce", Icon = "fas fa-shopping-bag", Price = 149, Description = "Complete e-commerce mobile application with payment processing and inventory.", Platform = "iOS & Android" },
+                    new { Name = "Analytics Dashboard", Icon = "fas fa-chart-pie", Price = 249, Description = "Interactive business intelligence dashboard with real-time data visualization.", Platform = "Web Platform" }
+                };
+            }
+            
+            @foreach (var (app, index) in apps.Select((a, i) => (a, i)))
+            {
+                <div class="col-lg-4 col-md-6">
+                    <div class="card h-100 product-card border-0 shadow-sm">
+                        <div class="position-relative overflow-hidden">
+                            <div class="bg-gradient d-flex align-items-center justify-content-center" style="height: 200px;">
+                                <i class="@app.Icon fa-4x text-white opacity-75"></i>
+                            </div>
+                            <div class="position-absolute top-0 end-0 m-3">
+                                <span class="badge bg-info">@app.Platform</span>
+                            </div>
+                        </div>
+                        <div class="card-body p-4">
+                            <h5 class="card-title fw-bold mb-2">@app.Name</h5>
+                            <p class="text-muted small mb-3">@app.Description</p>
+                            
+                            <div class="mb-3">
+                                <div class="d-flex align-items-center mb-2">
+                                    <div class="text-warning me-2">
+                                        @for (int star = 1; star <= 5; star++)
+                                        {
+                                            <i class="fas fa-star small"></i>
+                                        }
+                                    </div>
+                                    <small class="text-muted">(4.@(6 + index % 4)) · @((80 + index * 15)) reviews</small>
+                                </div>
+                            </div>
+
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <div>
+                                    <h4 class="text-primary fw-bold mb-0">$@(app.Price)/mo</h4>
+                                    <small class="text-muted">Per license</small>
+                                </div>
+                                <div class="text-end">
+                                    <small class="text-success fw-bold">✓ Free Updates</small>
+                                </div>
+                            </div>
+
+                            <button class="btn btn-primary w-100 mb-2" @onclick="() => NavigateToPurchase()">
+                                <i class="fas fa-download me-2"></i>Get App
+                            </button>
+                            <button class="btn btn-outline-primary w-100">
+                                <i class="fas fa-play me-2"></i>Live Demo
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+</section>
+
+<section class="py-5 bg-info text-white">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-lg-8">
+                <h3 class="fw-bold mb-3">Need a Custom Application?</h3>
+                <p class="lead mb-0">
+                    Our development team can create custom applications tailored to your unique business requirements.
+                    From concept to deployment, we handle the entire development lifecycle.
+                </p>
+            </div>
+            <div class="col-lg-4 text-lg-end">
+                <button class="btn btn-light btn-lg px-4">
+                    <i class="fas fa-code me-2"></i>Start Project
+                </button>
+            </div>
+        </div>
+    </div>
+</section>
+
+@code {
+    private void NavigateToPurchase()
+    {
+        Navigation.NavigateTo("/register");
+    }
+}

@@ -1,0 +1,180 @@
+@page "/register"
+@inject UserService UserService
+@inject NavigationManager Navigation
+@using MyShop_Site.Models.Common
+@using MyShop_Site.Models.RequestModels
+@using MyShop_Site.Models.ResponseModels
+@using MyShop_Site.Services
+
+<PageTitle>Register - MyShop</PageTitle>
+
+<div class="container-fluid min-vh-100 py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card shadow-lg border-0">
+                <div class="card-header bg-primary text-white text-center py-4">
+                    <h2 class="mb-0">Create Your MyShop Account</h2>
+                    <p class="mb-0">Join thousands of businesses worldwide</p>
+                </div>
+                <div class="card-body p-5">
+                    @if (!string.IsNullOrEmpty(errorMessage))
+                    {
+                        <div class="alert alert-danger" role="alert">
+                            @errorMessage
+                        </div>
+                    }
+
+                    <EditForm Model="registerModel" OnValidSubmit="HandleRegister">
+                        <DataAnnotationsValidator />
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Company Name *</label>
+                                <InputText @bind-Value="registerModel.CompanyName" class="form-control" placeholder="Enter company name" />
+                                <ValidationMessage For="() => registerModel.CompanyName" class="text-danger" />
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Contact Name *</label>
+                                <InputText @bind-Value="registerModel.ContactName" class="form-control" placeholder="Enter contact name" />
+                                <ValidationMessage For="() => registerModel.ContactName" class="text-danger" />
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Contact Email *</label>
+                                <InputText type="email" @bind-Value="registerModel.Email" class="form-control" placeholder="Enter email address" />
+                                <ValidationMessage For="() => registerModel.Email" class="text-danger" />
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Contact Phone *</label>
+                                <InputText @bind-Value="registerModel.PhoneNumber" class="form-control" placeholder="Enter phone number" />
+                                <ValidationMessage For="() => registerModel.PhoneNumber" class="text-danger" />
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Country *</label>
+                                <InputSelect @bind-Value="registerModel.Country" class="form-select">
+                                    <option value="">Select Country</option>
+                                    <option value="US">United States</option>
+                                    <option value="CA">Canada</option>
+                                    <option value="UK">United Kingdom</option>
+                                    <option value="DE">Germany</option>
+                                    <option value="FR">France</option>
+                                    <option value="AU">Australia</option>
+                                </InputSelect>
+                                <ValidationMessage For="() => registerModel.Country" class="text-danger" />
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Company Size *</label>
+                                <InputSelect @bind-Value="registerModel.CompanySize" class="form-select">
+                                    <option value="">Select Company Size</option>
+                                    <option value="<5">&lt;5 employees</option>
+                                    <option value="5-20">5-20 employees</option>
+                                    <option value="20-50">20-50 employees</option>
+                                    <option value="50-250">50-250 employees</option>
+                                    <option value=">250">&gt;250 employees</option>
+                                </InputSelect>
+                                <ValidationMessage For="() => registerModel.CompanySize" class="text-danger" />
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Industry (Optional)</label>
+                            <InputText @bind-Value="registerModel.Industry" class="form-control" placeholder="Enter your industry" />
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Username *</label>
+                                <InputText @bind-Value="registerModel.Username" class="form-control" placeholder="Choose a username" />
+                                <ValidationMessage For="() => registerModel.Username" class="text-danger" />
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Password *</label>
+                                <div class="input-group">
+                                    <InputText type="@(showPassword ? "text" : "password")" @bind-Value="registerModel.Password" class="form-control" placeholder="Enter password" />
+                                    <button type="button" class="btn btn-outline-secondary" @onclick="TogglePasswordVisibility">
+                                        <i class="fas @(showPassword ? "fa-eye-slash" : "fa-eye")"></i>
+                                    </button>
+                                </div>
+                                <ValidationMessage For="() => registerModel.Password" class="text-danger" />
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Confirm Password *</label>
+                                <InputText type="password" @bind-Value="registerModel.ConfirmPassword" class="form-control" placeholder="Confirm password" />
+                                <ValidationMessage For="() => registerModel.ConfirmPassword" class="text-danger" />
+                            </div>
+                        </div>
+
+                        <div class="mb-4">
+                            <div class="form-check">
+                                <InputCheckbox @bind-Value="registerModel.AcceptTerms" class="form-check-input" />
+                                <label class="form-check-label">
+                                    I accept the <a href="/terms" target="_blank">Terms and Conditions</a> *
+                                </label>
+                                <ValidationMessage For="() => registerModel.AcceptTerms" class="text-danger d-block" />
+                            </div>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary btn-lg w-100 mb-3" disabled="@isLoading">
+                            @if (isLoading)
+                            {
+                                <span class="spinner-border spinner-border-sm me-2" role="status"></span>
+                            }
+                            Create Account
+                        </button>
+                    </EditForm>
+
+                    <div class="text-center">
+                        <p class="mb-0">Already have an account? <a href="/login" class="text-decoration-none">Sign in here</a></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+    private RegisterRequestModel registerModel = new();
+    private string errorMessage = string.Empty;
+    private bool showPassword = false;
+    private bool isLoading = false;
+
+    private async Task HandleRegister()
+    {
+        errorMessage = "";
+        isLoading = true;
+
+        try
+        {
+            var result = await UserService.RegisterAsync(registerModel);
+            if (result.IsSuccess)
+            {
+                Navigation.NavigateTo("/login?message=Registration successful. Please log in.");
+            }
+            else
+            {
+                errorMessage = result.Message;
+            }
+        }
+        catch (Exception ex)
+        {
+            errorMessage = "An error occurred during registration. Please try again.";
+        }
+        finally
+        {
+            isLoading = false;
+        }
+    }
+
+    private void TogglePasswordVisibility()
+    {
+        showPassword = !showPassword;
+    }
+}

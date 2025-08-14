@@ -1,0 +1,206 @@
+
+@page "/Categories/hardware"
+@inject ProductService ProductService
+@inject NavigationManager Navigation
+
+<PageTitle>Hardware Solutions - MyShop</PageTitle>
+
+<div class="hero-section bg-gradient text-white">
+    <div class="container">
+        <div class="row align-items-center py-5">
+            <div class="col-lg-8 fade-in">
+                <div class="d-flex align-items-center mb-3">
+                    <div class="bg-white bg-opacity-20 rounded-circle p-3 me-3">
+                        <i class="fas fa-server fa-2x text-white"></i>
+                    </div>
+                    <div>
+                        <h1 class="display-4 fw-bold mb-2">Hardware Solutions</h1>
+                        <p class="lead mb-0">Enterprise-grade infrastructure for your business</p>
+                    </div>
+                </div>
+                <p class="fs-5 mb-4 opacity-75">
+                    Professional servers, networking equipment, and storage solutions designed 
+                    for mission-critical applications and scalable infrastructure.
+                </p>
+                <div class="d-flex align-items-center gap-4 text-white-50">
+                    <div class="d-flex align-items-center">
+                        <i class="fas fa-check-circle me-2 text-success"></i>
+                        <span>Enterprise Grade</span>
+                    </div>
+                    <div class="d-flex align-items-center">
+                        <i class="fas fa-shield-alt me-2 text-success"></i>
+                        <span>99.9% Uptime</span>
+                    </div>
+                    <div class="d-flex align-items-center">
+                        <i class="fas fa-tools me-2 text-success"></i>
+                        <span>Expert Support</span>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-4 text-center slide-in-right">
+                <div class="position-relative">
+                    <div class="bg-white bg-opacity-10 rounded-circle p-4 d-inline-block">
+                        <i class="fas fa-database fa-6x text-white opacity-75"></i>
+                    </div>
+                    <div class="position-absolute top-0 start-0 w-100 h-100">
+                        <div class="floating-elements">
+                            <i class="fas fa-server floating-icon"></i>
+                            <i class="fas fa-network-wired floating-icon"></i>
+                            <i class="fas fa-hdd floating-icon"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<section class="py-5 bg-light">
+    <div class="container">
+        <div class="row mb-5">
+            <div class="col-12 text-center">
+                <h2 class="display-5 fw-bold section-title mb-4">Hardware Categories</h2>
+                <p class="lead text-muted col-lg-8 mx-auto">
+                    From high-performance servers to enterprise networking solutions
+                </p>
+            </div>
+        </div>
+        
+        <div class="row g-4 mb-5">
+            <div class="col-lg-3 col-md-6">
+                <div class="card h-100 border-0 shadow-sm">
+                    <div class="card-body text-center p-4">
+                        <div class="bg-primary bg-opacity-10 rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 70px; height: 70px;">
+                            <i class="fas fa-server fa-2x text-primary"></i>
+                        </div>
+                        <h5 class="fw-bold">Servers</h5>
+                        <p class="text-muted small">High-performance rack and tower servers</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6">
+                <div class="card h-100 border-0 shadow-sm">
+                    <div class="card-body text-center p-4">
+                        <div class="bg-success bg-opacity-10 rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 70px; height: 70px;">
+                            <i class="fas fa-network-wired fa-2x text-success"></i>
+                        </div>
+                        <h5 class="fw-bold">Networking</h5>
+                        <p class="text-muted small">Switches, routers, and wireless solutions</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6">
+                <div class="card h-100 border-0 shadow-sm">
+                    <div class="card-body text-center p-4">
+                        <div class="bg-info bg-opacity-10 rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 70px; height: 70px;">
+                            <i class="fas fa-hdd fa-2x text-info"></i>
+                        </div>
+                        <h5 class="fw-bold">Storage</h5>
+                        <p class="text-muted small">SAN, NAS, and cloud storage solutions</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6">
+                <div class="card h-100 border-0 shadow-sm">
+                    <div class="card-body text-center p-4">
+                        <div class="bg-warning bg-opacity-10 rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 70px; height: 70px;">
+                            <i class="fas fa-shield-alt fa-2x text-warning"></i>
+                        </div>
+                        <h5 class="fw-bold">Security</h5>
+                        <p class="text-muted small">Firewalls and security appliances</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="py-5">
+    <div class="container">
+        <div class="row mb-5">
+            <div class="col-12 text-center">
+                <h2 class="display-5 fw-bold section-title mb-4">Featured Hardware Products</h2>
+                <p class="lead text-muted col-lg-8 mx-auto">
+                    Industry-leading hardware solutions trusted by enterprises worldwide
+                </p>
+            </div>
+        </div>
+
+        <div class="row g-4">
+            @for (int i = 1; i <= 6; i++)
+            {
+                <div class="col-lg-4 col-md-6">
+                    <div class="card h-100 product-card border-0 shadow-sm">
+                        <div class="position-relative overflow-hidden">
+                            <div class="bg-gradient d-flex align-items-center justify-content-center" style="height: 200px;">
+                                <i class="fas fa-server fa-4x text-white opacity-75"></i>
+                            </div>
+                            <div class="position-absolute top-0 end-0 m-3">
+                                <span class="badge bg-success">In Stock</span>
+                            </div>
+                        </div>
+                        <div class="card-body p-4">
+                            <h5 class="card-title fw-bold mb-2">Enterprise Server Pro @i</h5>
+                            <p class="text-muted small mb-3">High-performance rack server with advanced virtualization capabilities and enterprise-grade reliability.</p>
+                            
+                            <div class="mb-3">
+                                <div class="d-flex align-items-center mb-2">
+                                    <div class="text-warning me-2">
+                                        @for (int star = 1; star <= 5; star++)
+                                        {
+                                            <i class="fas fa-star small"></i>
+                                        }
+                                    </div>
+                                    <small class="text-muted">(4.8) · 156 reviews</small>
+                                </div>
+                            </div>
+
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <div>
+                                    <h4 class="text-primary fw-bold mb-0">$@((i * 2999))</h4>
+                                    <small class="text-muted">Starting price</small>
+                                </div>
+                                <div class="text-end">
+                                    <small class="text-success fw-bold">✓ Free Shipping</small>
+                                </div>
+                            </div>
+
+                            <button class="btn btn-primary w-100 mb-2" @onclick="() => NavigateToPurchase()">
+                                <i class="fas fa-shopping-cart me-2"></i>Purchase Now
+                            </button>
+                            <button class="btn btn-outline-primary w-100">
+                                <i class="fas fa-info-circle me-2"></i>View Details
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+</section>
+
+<section class="py-5 bg-primary text-white">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-lg-8">
+                <h3 class="fw-bold mb-3">Need Custom Hardware Solutions?</h3>
+                <p class="lead mb-0">
+                    Our experts can design and implement custom hardware infrastructure tailored to your specific requirements.
+                    Get professional consultation and enterprise-grade support.
+                </p>
+            </div>
+            <div class="col-lg-4 text-lg-end">
+                <button class="btn btn-light btn-lg px-4">
+                    <i class="fas fa-phone me-2"></i>Contact Sales
+                </button>
+            </div>
+        </div>
+    </div>
+</section>
+
+@code {
+    private void NavigateToPurchase()
+    {
+        Navigation.NavigateTo("/register");
+    }
+}

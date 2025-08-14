@@ -1,0 +1,217 @@
+@page "/Categories/products"
+@inject ProductService ProductService
+@inject NavigationManager Navigation
+
+<PageTitle>Business Products - MyShop</PageTitle>
+
+<div class="hero-section bg-gradient text-white">
+    <div class="container">
+        <div class="row align-items-center py-5">
+            <div class="col-lg-8 fade-in">
+                <div class="d-flex align-items-center mb-3">
+                    <div class="bg-white bg-opacity-20 rounded-circle p-3 me-3">
+                        <i class="fas fa-box fa-2x text-white"></i>
+                    </div>
+                    <div>
+                        <h1 class="display-4 fw-bold mb-2">Business Products</h1>
+                        <p class="lead mb-0">Comprehensive business management solutions</p>
+                    </div>
+                </div>
+                <p class="fs-5 mb-4 opacity-75">
+                    Streamline your operations with our comprehensive suite of business management tools, 
+                    productivity software, and analytics platforms designed for modern enterprises.
+                </p>
+                <div class="d-flex align-items-center gap-4 text-white-50">
+                    <div class="d-flex align-items-center">
+                        <i class="fas fa-check-circle me-2 text-success"></i>
+                        <span>Cloud-Based</span>
+                    </div>
+                    <div class="d-flex align-items-center">
+                        <i class="fas fa-shield-alt me-2 text-success"></i>
+                        <span>Secure & Compliant</span>
+                    </div>
+                    <div class="d-flex align-items-center">
+                        <i class="fas fa-chart-line me-2 text-success"></i>
+                        <span>Scalable Solutions</span>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-4 text-center slide-in-right">
+                <div class="position-relative">
+                    <div class="bg-white bg-opacity-10 rounded-circle p-4 d-inline-block">
+                        <i class="fas fa-chart-bar fa-6x text-white opacity-75"></i>
+                    </div>
+                    <div class="position-absolute top-0 start-0 w-100 h-100">
+                        <div class="floating-elements">
+                            <i class="fas fa-tasks floating-icon"></i>
+                            <i class="fas fa-users floating-icon"></i>
+                            <i class="fas fa-cogs floating-icon"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<section class="py-5 bg-light">
+    <div class="container">
+        <div class="row mb-5">
+            <div class="col-12 text-center">
+                <h2 class="display-5 fw-bold section-title mb-4">Product Categories</h2>
+                <p class="lead text-muted col-lg-8 mx-auto">
+                    Complete business solutions for every department and workflow
+                </p>
+            </div>
+        </div>
+        
+        <div class="row g-4 mb-5">
+            <div class="col-lg-3 col-md-6">
+                <div class="card h-100 border-0 shadow-sm">
+                    <div class="card-body text-center p-4">
+                        <div class="bg-success bg-opacity-10 rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 70px; height: 70px;">
+                            <i class="fas fa-chart-line fa-2x text-success"></i>
+                        </div>
+                        <h5 class="fw-bold">Analytics</h5>
+                        <p class="text-muted small">Business intelligence and reporting tools</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6">
+                <div class="card h-100 border-0 shadow-sm">
+                    <div class="card-body text-center p-4">
+                        <div class="bg-primary bg-opacity-10 rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 70px; height: 70px;">
+                            <i class="fas fa-users fa-2x text-primary"></i>
+                        </div>
+                        <h5 class="fw-bold">HR Management</h5>
+                        <p class="text-muted small">Employee management and payroll systems</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6">
+                <div class="card h-100 border-0 shadow-sm">
+                    <div class="card-body text-center p-4">
+                        <div class="bg-info bg-opacity-10 rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 70px; height: 70px;">
+                            <i class="fas fa-dollar-sign fa-2x text-info"></i>
+                        </div>
+                        <h5 class="fw-bold">Finance</h5>
+                        <p class="text-muted small">Accounting and financial management tools</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6">
+                <div class="card h-100 border-0 shadow-sm">
+                    <div class="card-body text-center p-4">
+                        <div class="bg-warning bg-opacity-10 rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 70px; height: 70px;">
+                            <i class="fas fa-tasks fa-2x text-warning"></i>
+                        </div>
+                        <h5 class="fw-bold">Project Management</h5>
+                        <p class="text-muted small">Task tracking and team collaboration</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="py-5">
+    <div class="container">
+        <div class="row mb-5">
+            <div class="col-12 text-center">
+                <h2 class="display-5 fw-bold section-title mb-4">Featured Business Products</h2>
+                <p class="lead text-muted col-lg-8 mx-auto">
+                    Powerful tools to optimize your business operations and drive growth
+                </p>
+            </div>
+        </div>
+
+        <div class="row g-4">
+            @{
+                var products = new[]
+                {
+                    new { Name = "Business Analytics Pro", Icon = "fas fa-chart-bar", Price = 299, Description = "Advanced business intelligence platform with real-time dashboards and predictive analytics." },
+                    new { Name = "HR Management Suite", Icon = "fas fa-user-tie", Price = 199, Description = "Complete human resources management system with payroll, benefits, and performance tracking." },
+                    new { Name = "Financial Controller", Icon = "fas fa-calculator", Price = 399, Description = "Comprehensive accounting software with automated bookkeeping and financial reporting." },
+                    new { Name = "Project Manager Pro", Icon = "fas fa-project-diagram", Price = 149, Description = "Advanced project management tool with team collaboration and resource planning." },
+                    new { Name = "CRM Enterprise", Icon = "fas fa-handshake", Price = 249, Description = "Customer relationship management platform with sales automation and lead tracking." },
+                    new { Name = "Inventory Control", Icon = "fas fa-warehouse", Price = 179, Description = "Smart inventory management system with automated reordering and stock optimization." }
+                };
+            }
+            
+            @foreach (var (product, index) in products.Select((p, i) => (p, i)))
+            {
+                <div class="col-lg-4 col-md-6">
+                    <div class="card h-100 product-card border-0 shadow-sm">
+                        <div class="position-relative overflow-hidden">
+                            <div class="bg-gradient d-flex align-items-center justify-content-center" style="height: 200px;">
+                                <i class="@product.Icon fa-4x text-white opacity-75"></i>
+                            </div>
+                            <div class="position-absolute top-0 end-0 m-3">
+                                <span class="badge bg-success">Available</span>
+                            </div>
+                        </div>
+                        <div class="card-body p-4">
+                            <h5 class="card-title fw-bold mb-2">@product.Name</h5>
+                            <p class="text-muted small mb-3">@product.Description</p>
+                            
+                            <div class="mb-3">
+                                <div class="d-flex align-items-center mb-2">
+                                    <div class="text-warning me-2">
+                                        @for (int star = 1; star <= 5; star++)
+                                        {
+                                            <i class="fas fa-star small"></i>
+                                        }
+                                    </div>
+                                    <small class="text-muted">(4.@(7 + index % 3)) · @((45 + index * 20)) reviews</small>
+                                </div>
+                            </div>
+
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <div>
+                                    <h4 class="text-primary fw-bold mb-0">$@(product.Price)/mo</h4>
+                                    <small class="text-muted">Per user</small>
+                                </div>
+                                <div class="text-end">
+                                    <small class="text-success fw-bold">✓ 30-day trial</small>
+                                </div>
+                            </div>
+
+                            <button class="btn btn-primary w-100 mb-2" @onclick="() => NavigateToPurchase()">
+                                <i class="fas fa-shopping-cart me-2"></i>Start Trial
+                            </button>
+                            <button class="btn btn-outline-primary w-100">
+                                <i class="fas fa-info-circle me-2"></i>Learn More
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+</section>
+
+<section class="py-5 bg-success text-white">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-lg-8">
+                <h3 class="fw-bold mb-3">Ready to Transform Your Business Operations?</h3>
+                <p class="lead mb-0">
+                    Start your digital transformation journey today with our integrated business solutions.
+                    Get a personalized demo and see how our products can streamline your workflows.
+                </p>
+            </div>
+            <div class="col-lg-4 text-lg-end">
+                <button class="btn btn-light btn-lg px-4">
+                    <i class="fas fa-calendar me-2"></i>Schedule Demo
+                </button>
+            </div>
+        </div>
+    </div>
+</section>
+
+@code {
+    private void NavigateToPurchase()
+    {
+        Navigation.NavigateTo("/register");
+    }
+}
