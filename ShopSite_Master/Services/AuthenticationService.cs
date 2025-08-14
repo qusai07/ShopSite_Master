@@ -1,68 +1,44 @@
-
-using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage;
-using Microsoft.AspNetCore.DataProtection;
+using Microsoft.Extensions.Logging;
 using MyShop_Site.Models.ResponseModels;
-using MyShop_Site.Repo.Interfaces;
+using System;
+using System.Collections.Generic;
 using System.Security.Claims;
 using System.Text.Json;
+using System.Threading.Tasks;
+using MyShop_Site.Repo.Interfaces;
 using LoginRequestModel = MyShop_Site.Models.Common.LoginRequestModel;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Http;
+
 
 namespace MyShop_Site.Services
 {
     public class AuthenticationService : IAuthenticationService
     {
-        private readonly MasterService _masterService;
-        private readonly IHttpContextAccessor _httpContextAccessor;
-        private readonly ProtectedSessionStorage _protectedStorage;
+        private readonly IApiClient _apiClient;
+        private readonly IJwtTokenService _tokenService;
         private readonly CustomAuthenticationStateProvider _authStateProvider;
-
-        private readonly ISecureCookieService _cookieService;
-
-
+        private readonly NavigationManager _navigationManager;
+        private readonly ILogger<AuthenticationService> _logger;
 
         public AuthenticationService(
-            MasterService masterService, IHttpContextAccessor httpContextAccessor,
-            ProtectedSessionStorage protectedStorage,
-            CustomAuthenticationStateProvider authStateProvider)
-
+            IApiClient apiClient,
+            IJwtTokenService tokenService,
+            CustomAuthenticationStateProvider authStateProvider,
+            NavigationManager navigationManager,
+            ILogger<AuthenticationService> logger)
         {
-            _masterService = masterService;
-            _httpContextAccessor = httpContextAccessor;
-            _protectedStorage = protectedStorage;
+            _apiClient = apiClient;
+            _tokenService = tokenService;
             _authStateProvider = authStateProvider;
+            _navigationManager = navigationManager;
+            _logger = logger;
         }
-        public async Task<UserInfoResponseModel> GetProfileAsync()
-        {
-            try
-            {
-                // Get the stored token from your secure cookie
-                var stored = await _protectedStorage.GetAsync<string>("auth_data");
-                if (!stored.Success || string.IsNullOrEmpty(stored.Value)) return null;
 
-                var authData = JsonSerializer.Deserialize<Models.Authentication.AuthenticationData>(_dataProtector.Unprotect(stored.Value));
-                if (authData == null) return null;
-
-                // Set the token in the MasterService so RequestMasterAsync uses it
-                _masterService.SetAuthenticationToken(authData.Token, authData.TokenExpiry);
-
-                // Fetch the user profile via MasterService
-                var response = await _masterService.RequestMasterAsync<UserInfoResponseModel>("User/GetUser");
-
-                if (response.IsSuccess)
-                {
-                    return response;
-                }
-
-                return null;
-            }
-            catch (Exception ex)
-            {
-                return null;
-            }
-        }
         public async Task<AuthenticationResult> AuthenticateAsync(string username, string password, bool rememberMe = false)
         {
             try
@@ -73,50 +49,25 @@ namespace MyShop_Site.Services
                     Password = password,
                 };
 
-                var response = await _masterService.RequestMasterAsync<LoginResponseModel>(
-                    "Authentication/Authenticate", loginRequest);
+                var response = await _apiClient.PostAsync<LoginResponseModel>("Authentication/Authenticate", loginRequest);
 
-                if (response.IsSuccess && !string.IsNullOrEmpty(response.Token))
+                if (response?.IsSuccess == true && !string.IsNullOrEmpty(response.Token))
                 {
-                    var claims = new List<Claim>
-                    {
-                        new Claim("access_token", response.Token)
-                    };
+                    // Store token securely
+                    await _tokenService.SetTokenAsync(response.Token);
 
-                    var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
-                    var claimsPrincipal = new ClaimsPrincipal(claimsIdentity);
-
-                    var authProperties = new AuthenticationProperties
-                    {
-                        IsPersistent = rememberMe,
-                        ExpiresUtc = rememberMe ? DateTimeOffset.UtcNow.AddDays(30) : DateTimeOffset.UtcNow.AddHours(8),
-                        AllowRefresh = true
-                    };
-
-                    var httpContext = _httpContextAccessor.HttpContext;
-                    if (httpContext != null)
-                    {
-                        await httpContext.SignInAsync(
-                            CookieAuthenticationDefaults.AuthenticationScheme,
-                            claimsPrincipal,
-                            authProperties);
-                    }
-
-                    // Save token in ProtectedSessionStorage
-                    await _protectedStorage.SetAsync("auth_token", response.Token);
-                    await _protectedStorage.SetAsync("token_expiry", DateTime.UtcNow.AddHours(1).ToString("O"));
-
-                    // Optionally store refresh token
-                    await _protectedStorage.SetAsync("refresh_token", response.Token);
-
-
-                    await _authStateProvider.MarkUserAsAuthenticatedAsync(claimsPrincipal);
+                    // Update authentication state
+                    // This part assumes CustomAuthenticationStateProvider has a method to set the token and authenticate
+                    // If it relies on ClaimsPrincipal, we might need to create one from the token.
+                    // For now, assuming it can handle the token directly for authentication state.
+                    await _authStateProvider.MarkUserAsAuthenticatedAsync(response.Token);
 
                     return new AuthenticationResult
                     {
                         IsSuccess = true,
                         Message = "Authentication successful",
                         Token = response.Token,
+                        // TokenExpiry should ideally be parsed from the JWT itself
                         TokenExpiry = DateTime.UtcNow.AddHours(1)
                     };
                 }
@@ -124,11 +75,12 @@ namespace MyShop_Site.Services
                 return new AuthenticationResult
                 {
                     IsSuccess = false,
-                    Message = response.Message ?? "Authentication failed"
+                    Message = response?.Message ?? "Authentication failed"
                 };
             }
             catch (Exception ex)
             {
+                _logger.LogError(ex, "Error during authentication");
                 return new AuthenticationResult
                 {
                     IsSuccess = false,
@@ -137,46 +89,36 @@ namespace MyShop_Site.Services
             }
         }
 
-        //public async Task<bool> RefreshTokenAsync()
-        //{
-        //    try
-        //    {
-        //        var authData = _cookieService.GetCookie<AuthenticationData>("auth_data");
-        //        if (authData?.RefreshToken == null)
-        //            return false;
-
-        //        var refreshRequest = new { RefreshToken = authData.RefreshToken };
-        //        var response = await _masterService.RequestMasterAsync<LoginResponseModel>("Authentication/Refresh", refreshRequest);
-
-        //        if (response.IsSuccess && !string.IsNullOrEmpty(response.Token))
-        //        {
-        //            authData.Token = response.Token;
-        //            authData.TokenExpiry = DateTime.UtcNow.AddHours(1);
-        //            authData.RefreshToken = response.Token ?? authData.RefreshToken;
-
-        //            _cookieService.SetSecureCookie("auth_data", authData.Token);
-        //            await _authStateProvider.MarkUserAsAuthenticatedAsync(authData);
-
-        //            return true;
-        //        }
-
-        //        return false;
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        return false;
-        //    }
-        //}
+        public async Task<UserInfoResponseModel?> GetProfileAsync()
+        {
+            try
+            {
+                var response = await _apiClient.GetAsync<UserInfoResponseModel>("User/GetUser");
+                return response;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error getting user profile");
+                return null;
+            }
+        }
 
         public async Task LogoutAsync()
         {
             try
             {
-                _cookieService.ClearAuthenticationCookie();
+                // Clear token from the token service
+                await _tokenService.ClearTokenAsync(); // Assuming IJwtTokenService has a ClearTokenAsync method
+
+                // Update authentication state
                 await _authStateProvider.MarkUserAsLoggedOutAsync();
+
+                // Redirect to login page
+                _navigationManager.NavigateTo("/login", true);
             }
             catch (Exception ex)
             {
+                _logger.LogError(ex, "Error during logout");
             }
         }
 
@@ -192,29 +134,41 @@ namespace MyShop_Site.Services
             return authState.User.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? string.Empty;
         }
 
-        public async Task<UserInfoResponseModel> GetCurrentUserAsync()
+        public async Task<UserInfoResponseModel?> GetCurrentUserAsync()
         {
-            var authData = _cookieService.GetCookie<Models.Authentication.AuthenticationData>("auth_data");
-            if (authData == null)
-                return new UserInfoResponseModel { IsSuccess = false };
+            // This method should ideally fetch user profile using the API client
+            return await GetProfileAsync();
+        }
 
-            // You can fetch full user details from Master API if needed
-            return new UserInfoResponseModel
+        public async Task<bool> RefreshTokenAsync()
+        {
+            // Implement logic to refresh the token using the API client and IJwtTokenService
+            // This is a placeholder, actual implementation depends on API capabilities
+            var token = await _tokenService.GetTokenAsync();
+            if (string.IsNullOrEmpty(token))
             {
-                //UserId = authData.UserId,
-                //Username = authData.Username,
-                IsSuccess = true
-            };
+                return false;
+            }
+
+            // Assuming the API has a Refresh endpoint that accepts the current token
+            // and returns a new token.
+            var refreshResponse = await _apiClient.PostAsync<LoginResponseModel>("Authentication/Refresh", new { Token = token });
+
+            if (refreshResponse?.IsSuccess == true && !string.IsNullOrEmpty(refreshResponse.Token))
+            {
+                await _tokenService.SetTokenAsync(refreshResponse.Token);
+                await _authStateProvider.MarkUserAsAuthenticatedAsync(refreshResponse.Token); // Re-authenticate with new token
+                return true;
+            }
+
+            // If refresh fails, logout the user
+            await LogoutAsync();
+            return false;
         }
 
-        public Task<bool> RefreshTokenAsync()
+        public async Task<string?> GetCurrentTokenAsync()
         {
-            throw new NotImplementedException();
-        }
-
-        public Task<string?> GetCurrentTokenAsync()
-        {
-            throw new NotImplementedException();
+            return await _tokenService.GetTokenAsync();
         }
     }
 }

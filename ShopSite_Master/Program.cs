@@ -28,8 +28,13 @@ builder.Services.AddScoped(sp => sp.GetRequiredService<IHttpClientFactory>().Cre
 // Repositories
 builder.Services.AddScoped<ISecureCookieService, SecureCookieService>();
 
+// JWT Token Service
+builder.Services.AddScoped<IJwtTokenService, JwtTokenService>();
+
+// API Client
+builder.Services.AddScoped<IApiClient, ApiClient>();
+
 // Custom services
-builder.Services.AddScoped<MasterService>();
 builder.Services.AddScoped<CustomAuthenticationStateProvider>();
 builder.Services.AddScoped<AuthenticationStateProvider>(
     provider => provider.GetRequiredService<CustomAuthenticationStateProvider>()

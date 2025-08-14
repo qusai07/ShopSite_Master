@@ -1,80 +1,119 @@
+
 using Microsoft.AspNetCore.Components.Authorization;
-using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage;
-using MyShop_Site.Models;
-using MyShop_Site.Repo.Interfaces;
+using Microsoft.Extensions.Logging;
+using System;
+using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
+using System.Threading.Tasks;
 
 namespace MyShop_Site.Services
 {
     public class CustomAuthenticationStateProvider : AuthenticationStateProvider
     {
-        private readonly IHttpContextAccessor _httpContextAccessor;
-        private readonly ProtectedSessionStorage _protectedSessionStorage;
+        private readonly IJwtTokenService _tokenService;
         private readonly ILogger<CustomAuthenticationStateProvider> _logger;
 
-
         public CustomAuthenticationStateProvider(
-           IHttpContextAccessor httpContextAccessor,
-           ProtectedSessionStorage protectedSessionStorage,
+           IJwtTokenService tokenService,
            ILogger<CustomAuthenticationStateProvider> logger)
         {
-            _httpContextAccessor = httpContextAccessor;
-            _protectedSessionStorage = protectedSessionStorage;
+            _tokenService = tokenService;
             _logger = logger;
         }
 
-        public override Task<AuthenticationState> GetAuthenticationStateAsync()
+        public override async Task<AuthenticationState> GetAuthenticationStateAsync()
         {
-            throw new NotImplementedException();
+            try
+            {
+                var token = await _tokenService.GetTokenAsync();
+                
+                if (string.IsNullOrEmpty(token))
+                {
+                    return new AuthenticationState(new ClaimsPrincipal(new ClaimsIdentity()));
+                }
+
+                // Parse JWT token to extract claims
+                var handler = new JwtSecurityTokenHandler();
+                var jsonToken = handler.ReadJwtToken(token);
+
+                // Check if token is expired
+                if (jsonToken.ValidTo <= DateTime.UtcNow)
+                {
+                    await _tokenService.DeleteTokenAsync();
+                    return new AuthenticationState(new ClaimsPrincipal(new ClaimsIdentity()));
+                }
+
+                // Create claims from JWT
+                var claims = new List<Claim>();
+                
+                // Add standard claims from JWT
+                foreach (var claim in jsonToken.Claims)
+                {
+                    claims.Add(new Claim(claim.Type, claim.Value));
+                }
+
+                // Ensure we have required claims
+                if (!claims.Any(c => c.Type == ClaimTypes.NameIdentifier))
+                {
+                    // Add user ID from 'sub' claim if it exists
+                    var subClaim = claims.FirstOrDefault(c => c.Type == "sub");
+                    if (subClaim != null)
+                    {
+                        claims.Add(new Claim(ClaimTypes.NameIdentifier, subClaim.Value));
+                    }
+                }
+
+                if (!claims.Any(c => c.Type == ClaimTypes.Name))
+                {
+                    // Add name from various possible claims
+                    var nameClaim = claims.FirstOrDefault(c => c.Type == "name" || c.Type == "username" || c.Type == "unique_name");
+                    if (nameClaim != null)
+                    {
+                        claims.Add(new Claim(ClaimTypes.Name, nameClaim.Value));
+                    }
+                }
+
+                var identity = new ClaimsIdentity(claims, "jwt");
+                var principal = new ClaimsPrincipal(identity);
+
+                return new AuthenticationState(principal);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogWarning(ex, "Error reading authentication state");
+                await _tokenService.DeleteTokenAsync();
+                return new AuthenticationState(new ClaimsPrincipal(new ClaimsIdentity()));
+            }
         }
 
-        //public override async Task<AuthenticationState> GetAuthenticationStateAsync()
-        //{
-        //    try
-        //    {
-        //        var httpContext = _httpContextAccessor.HttpContext;
-        //        if (httpContext?.User?.Identity?.IsAuthenticated == true)
-        //            var authdata  = await _
-        //        var authData = await _cookieService.GetCookie<AuthenticationData>("auth_data");
-
-        //        if (authData != null &&
-        //            !string.IsNullOrEmpty(authData.Token) &&
-        //            authData.TokenExpiry > DateTime.UtcNow)
-        //        {
-        //            // User is authenticated via ASP.NET Core cookies
-        //            return new AuthenticationState(httpContext.User);
-        //        }
-
-        //        // Return anonymous state
-        //        return new AuthenticationState(new ClaimsPrincipal(new ClaimsIdentity()));
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        _logger.LogWarning(ex, "Error reading authentication state");
-        //        return new AuthenticationState(new ClaimsPrincipal(new ClaimsIdentity()));
-        //    }
-        //}
-
-        public async Task MarkUserAsAuthenticatedAsync(Models.Authentication.AuthenticationData authData)
+        public async Task MarkUserAsAuthenticatedAsync(string token)
         {
-            var claims = new[]
+            try
             {
-                //new Claim(ClaimTypes.NameIdentifier, authData.UserId),
-                //new Claim(ClaimTypes.Name, authData.Username),
-                new Claim("token", authData.Token),
-                new Claim("token_expiry", authData.TokenExpiry.ToString("O"))
-            };
-
-            var identity = new ClaimsIdentity(claims, "cookie");
-            var principal = new ClaimsPrincipal(identity);
-
-            NotifyAuthenticationStateChanged(Task.FromResult(new AuthenticationState(principal)));
+                await _tokenService.SetTokenAsync(token);
+                
+                // Parse token and create authentication state
+                var authState = await GetAuthenticationStateAsync();
+                NotifyAuthenticationStateChanged(Task.FromResult(authState));
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error marking user as authenticated");
+            }
         }
 
         public async Task MarkUserAsLoggedOutAsync()
         {
-            var anonymous = new ClaimsPrincipal(new ClaimsIdentity());
-            NotifyAuthenticationStateChanged(Task.FromResult(new AuthenticationState(anonymous)));
+            try
+            {
+                await _tokenService.DeleteTokenAsync();
+                var anonymous = new ClaimsPrincipal(new ClaimsIdentity());
+                NotifyAuthenticationStateChanged(Task.FromResult(new AuthenticationState(anonymous)));
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error marking user as logged out");
+            }
         }
     }
 }

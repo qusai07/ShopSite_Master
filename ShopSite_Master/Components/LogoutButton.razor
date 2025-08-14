@@ -1,0 +1,19 @@
+
+@using Microsoft.AspNetCore.Components.Authorization
+@using MyShop_Site.Services
+@inject IAuthenticationService AuthService
+
+<AuthorizeView>
+    <Authorized>
+        <button class="btn btn-outline-danger" @onclick="HandleLogout">
+            <i class="fas fa-sign-out-alt"></i> Logout
+        </button>
+    </Authorized>
+</AuthorizeView>
+
+@code {
+    private async Task HandleLogout()
+    {
+        await AuthService.LogoutAsync();
+    }
+}
