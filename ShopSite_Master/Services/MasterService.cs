@@ -20,10 +20,10 @@ namespace MyShop_Site.Services
 
         public string MasterBaseUrl { get; }
 
-        public  MasterService(ISecureCookieService cookieService,HttpClient httpClient, IConfiguration configuration, ILogger<MasterService> logger)
+        public MasterService(IHttpClientFactory httpClientFactory, ISecureCookieService cookieService, IConfiguration configuration, ILogger<MasterService> logger)
         {
             _cookieService = cookieService;
-            _httpClient = httpClient;
+            _httpClient = httpClientFactory.CreateClient("MasterAPI");
             _configuration = configuration;
             _logger = logger;
             MasterBaseUrl = _configuration["MasterAPI:BaseUrl"] ?? "http://192.168.0.15/ShopMaster";

@@ -72,6 +72,9 @@ namespace MyShopSite.Startup
             // JWT token service & cookie
             services.AddScoped<ISecureCookieService, SecureCookieService>();
 
+            // Master service
+            services.AddScoped<MasterService>();
+
             services.AddHttpContextAccessor();
 
             return services; 

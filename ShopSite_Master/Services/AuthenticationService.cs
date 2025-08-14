@@ -1,18 +1,13 @@
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Authorization;
-using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage;
 using Microsoft.Extensions.Logging;
+using MyShop_Site.Models.Authentication;
 using MyShop_Site.Models.ResponseModels;
-using System;
-using System.Collections.Generic;
-using System.Security.Claims;
-using System.Text.Json;
-using System.Threading.Tasks;
+using MyShop_Site.Models.Common;
 using MyShop_Site.Repo.Interfaces;
-using LoginRequestModel = MyShop_Site.Models.Common.LoginRequestModel;
-using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Authentication.Cookies;
-using Microsoft.AspNetCore.Http;
+using System;
+using System.Security.Claims;
+using System.Threading.Tasks;
 
 
 namespace MyShop_Site.Services
@@ -45,7 +40,7 @@ namespace MyShop_Site.Services
         {
             try
             {
-                LoginRequestModel loginRequest = new ()
+                var loginRequest = new LoginRequestModel
                 {
                     Username = username,
                     Password = password,

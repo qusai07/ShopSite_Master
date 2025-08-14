@@ -1,5 +1,5 @@
 
-using MyShop_Site.Models.Common;
+using MyShop_Site.Models.Authentication;
 using MyShop_Site.Models.ResponseModels;
 
 namespace MyShop_Site.Services
@@ -14,20 +14,4 @@ namespace MyShop_Site.Services
         Task<UserInfoResponseModel> GetCurrentUserAsync();
         Task<string?> GetCurrentTokenAsync();
     }
-    public class AuthenticationResult
-    {
-        public bool IsSuccess { get; set; }
-        public string Message { get; set; } = string.Empty;
-        public UserInfoResponseModel? User { get; set; }
-        public string? Token { get; set; }
-        public DateTime? TokenExpiry { get; set; }
-    }
-}
-public class AuthenticationResult
-{
-    public bool IsSuccess { get; set; }
-    public string Message { get; set; } = string.Empty;
-    public UserInfoResponseModel? User { get; set; }
-    public string? Token { get; set; }
-    public DateTime? TokenExpiry { get; set; }
 }

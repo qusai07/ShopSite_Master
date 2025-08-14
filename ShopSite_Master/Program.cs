@@ -4,6 +4,7 @@ var builder = WebApplication.CreateBuilder(args);
 
 // -------------------- Services --------------------
 builder.Services.AddMyShopServices(builder.Configuration);
+builder.Services.AddBusinessServiceModule();
 builder.Services.AddMyShopCors(builder.Configuration);
 
 // -------------------- Build app --------------------

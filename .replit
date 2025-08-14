@@ -6,3 +6,19 @@ channel = "stable-25_05"
 
 [deployment]
 run = ["sh", "-c", "dotnet run"]
+
+[workflows]
+runButton = "Run Blazor Server"
+
+[[workflows.workflow]]
+name = "Run Blazor Server"
+author = 30852656
+mode = "sequential"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "cd ShopSite_Master"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "dotnet run"
