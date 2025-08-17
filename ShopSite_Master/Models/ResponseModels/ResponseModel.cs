@@ -1,4 +1,3 @@
-
 using System.Text.Json.Serialization;
 
 namespace MyShop_Site.Models.ResponseModels
@@ -9,25 +8,25 @@ namespace MyShop_Site.Models.ResponseModels
         string? Message { get; set; }
     }
 
-    public class BaseResponseModel : IResponseModel
+    public class ResponseModel : IResponseModel
     {
         [JsonPropertyName("isSuccess")]
         public bool IsSuccess { get; set; }
 
         [JsonPropertyName("message")]
-        public string Message { get; set; }
+        public string? Message { get; set; }
 
         [JsonPropertyName("errorCode")]
-        public string ErrorCode { get; set; }
+        public string? ErrorCode { get; set; }
     }
 
-    public class BaseResponseModel<T> : BaseResponseModel
+    public class BaseResponseModel<T> : ResponseModel
     {
         [JsonPropertyName("data")]
-        public T Data { get; set; }
+        public T? Data { get; set; }
     }
 
-    public class ListResponseModel<T> : BaseResponseModel
+    public class ListResponseModel<T> : ResponseModel
     {
         [JsonPropertyName("data")]
         public List<T> Data { get; set; } = new List<T>();
@@ -39,14 +38,14 @@ namespace MyShop_Site.Models.ResponseModels
     public class EmptyResponseModel : IResponseModel
     {
         public bool IsSuccess { get; set; } = true;
-        public string Message { get; set; } = string.Empty;
+        public string? Message { get; set; } = string.Empty;
     }
 
     public class FailedResponseModel : IResponseModel
     {
         public bool IsSuccess { get; set; } = false;
-        public string Message { get; set; } = string.Empty;
-        public string ErrorCode { get; set; } = string.Empty;
-        public string ErrorDetail { get; set; } = string.Empty;
+        public string? Message { get; set; } = string.Empty;
+        public string? ErrorCode { get; set; } = string.Empty;
+        public string? ErrorDetail { get; set; } = string.Empty;
     }
 }

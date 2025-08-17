@@ -78,15 +78,8 @@ namespace ShopSite_Master.Services.Master
         {
             try
             {
-                var response = await _masterService.RequestMasterAsync<UserInfoResponseModel>("User/GetUser");
-
-                if (response is UserInfoResponseModel userInfo)
-                {
-                    return userInfo;
-                }
-
-                _logger.LogWarning("Failed to get user profile. Response is not UserInfoResponseModel.");
-                return null;
+                var profile = await _masterService.RequestMasterAsync<UserInfoResponseModel>("Auth/GetProfile");
+                return profile;
             }
             catch (Exception ex)
             {
@@ -94,6 +87,8 @@ namespace ShopSite_Master.Services.Master
                 return null;
             }
         }
+
+
 
         public async Task LogoutAsync()
         {

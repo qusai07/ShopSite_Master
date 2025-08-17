@@ -5,7 +5,7 @@ namespace ShopSite_Master.Services.Interfaces
 {
     public interface IAuthenticationService
     {
-        Task <bool> AuthenticateAsync(string username, string password);
+        Task <AuthenticationResult> AuthenticateAsync(string username, string password);
         Task<bool> IsAuthenticatedAsync();
     }
 }

@@ -18,23 +18,33 @@ namespace ShopSite_Master.Services.Implementations
             _masterService = masterService;
         }
 
-        public async Task<bool> AuthenticateAsync(string username, string password)
+        public async Task<AuthenticationResult> AuthenticateAsync(string userNameOrEmail, string password)
         {
-            string token = null;
             using HttpClient httpClient = new HttpClient();
-            using HttpResponseMessage httpResponseMessage = await httpClient.PostAsync(
-                $"http://192.168.0.15/ShopMaster/api/Authentication/Authenticate",
-                JsonContent.Create(new { username, password }));
-            if (httpResponseMessage.IsSuccessStatusCode)
+            var response = await httpClient.PostAsync(
+                "http://192.168.1.115:5300/SmartApp/api/Auth/Login",
+                JsonContent.Create(new { userNameOrEmail, password }));
+
+            var content = await response.Content.ReadAsStringAsync();
+
+            if (response.IsSuccessStatusCode)
             {
-                token = await httpResponseMessage.Content.ReadAsStringAsync();
+                // السيرفر رجع الـ JWT مباشرة كنص
+                return new AuthenticationResult
+                {
+                    IsSuccess = true,
+                    Token = content
+                };
             }
-            return true;
-
+            else
+            {
+                return new AuthenticationResult
+                {
+                    IsSuccess = false,
+                    Message = $"Login failed: {content}"
+                };
+            }
         }
-
-
-
         public async Task<bool> IsAuthenticatedAsync()
         {
             var authState = await _authStateProvider.GetAuthenticationStateAsync();

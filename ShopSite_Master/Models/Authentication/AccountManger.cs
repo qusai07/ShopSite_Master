@@ -1,4 +1,5 @@
 ﻿using MyShop_Site.Models.RequestModels;
+using MyShop_Site.Models.ResponseModels;
 
 namespace MyShop_Site.Models.Authentication
 {
@@ -16,25 +17,25 @@ namespace MyShop_Site.Models.Authentication
         public string UserName { get; set; }
         public string Password { get; set; }
     }
-    public class CreateUserResponseModel : IResponseModel
-    {
-        public Guid ID { get; set; }
-    }
-    public class LoginUserResponseModel : IResponseModel
-    {
-        public string Token{ get; set; }
-    }
+    //public class CreateUserResponseModel : IResponseModel
+    //{
+    //    public Guid ID { get; set; }
+    //}
+    //public class LoginUserResponseModel : IResponseModel
+    //{
+    //    public string Token{ get; set; }
+    //}
  
     public class VerifyUserModel : JsonRequestModel
     {
         public Guid ID { get; set; }
         public string OtpCode { get; set; }
     }
-    public class VerifyUserResponseModel : IResponseModel
-    {
-        public Guid ID { get; set; }
-        public string UserPassword { get; set; }
-    }
+    //public class VerifyUserResponseModel : IResponseModel
+    //{
+    //    public Guid ID { get; set; }
+    //    public string UserPassword { get; set; }
+    //}
     public class SetUserPasswordModel : JsonRequestModel
     {
         public string OldPassword { get; set; }

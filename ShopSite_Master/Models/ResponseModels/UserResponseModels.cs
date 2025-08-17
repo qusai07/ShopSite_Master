@@ -3,29 +3,24 @@ using System.Text.Json.Serialization;
 using MyShop_Site.Models.RequestModels;
 namespace MyShop_Site.Models.ResponseModels
 {
-    public class UserInfoResponseModel : IResponseModel
-    {
-        [JsonPropertyName("ID")]
-        public int ID { get; set; }
+    using System.Text.Json.Serialization;
 
-        [JsonPropertyName("UserName")]
+    public class UserInfoResponseModel
+    {
+        [JsonPropertyName("id")]
+        public Guid ID { get; set; }
+
+        [JsonPropertyName("userName")]
         public string UserName { get; set; }
 
-        [JsonPropertyName("EmailAddress")]
+        [JsonPropertyName("emailAddress")]
         public string EmailAddress { get; set; }
 
-        [JsonPropertyName("MobileNumber")]
-        public string MobileNumber { get; set; }
-
-        [JsonPropertyName("FullName")]
+        [JsonPropertyName("fullName")]
         public string FullName { get; set; }
 
-        [JsonPropertyName("IsActive")]
+        [JsonPropertyName("isActive")]
         public bool IsActive { get; set; }
-
-        // Required by IResponseModel
-        public bool IsSuccess { get; set; }
-        public string? Message { get; set; }
     }
 
     public class LoginResponseModel : IResponseModel
@@ -36,7 +31,7 @@ namespace MyShop_Site.Models.ResponseModels
         public string Message { get; set; }
     }
 
-    public class RegisterResponseModel : BaseResponseModel
+    public class RegisterResponseModel : ResponseModel
     {
         [JsonPropertyName("userId")]
         public int UserId { get; set; }

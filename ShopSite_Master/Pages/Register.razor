@@ -153,17 +153,17 @@
 
         try
         {
-            var result = await UserService.RegisterAsync(registerModel);
-            if (result.IsSuccess)
-            {
-                Navigation.NavigateTo("/login?message=Registration successful. Please log in.");
-            }
-            else
-            {
-                errorMessage = result.Message;
-            }
+            //var result = await UserService.RegisterAsync(registerModel);
+            //if (result.IsSuccess)
+            //{
+            //    Navigation.NavigateTo("/login?message=Registration successful. Please log in.");
+            //}
+            //else
+            //{
+            //    errorMessage = result.Message;
+            //}
         }
-        catch (Exception ex)
+        catch 
         {
             errorMessage = "An error occurred during registration. Please try again.";
         }
