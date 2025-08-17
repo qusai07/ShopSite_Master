@@ -1,7 +1,6 @@
-
 using MyShop_Site.Models;
 
-namespace MyShop_Site.Services
+namespace ShopSite_Master.Services.Master
 {
     public class OrderService
     {

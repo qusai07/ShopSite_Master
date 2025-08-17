@@ -1,9 +1,9 @@
 
 using System.Text.Json.Serialization;
-
+using MyShop_Site.Models.RequestModels;
 namespace MyShop_Site.Models.ResponseModels
 {
-    public class UserInfoResponseModel : BaseResponseModel
+    public class UserInfoResponseModel : IResponseModel
     {
         [JsonPropertyName("ID")]
         public int ID { get; set; }
@@ -14,35 +14,26 @@ namespace MyShop_Site.Models.ResponseModels
         [JsonPropertyName("EmailAddress")]
         public string EmailAddress { get; set; }
 
-        //[JsonPropertyName("companyName")]
-        //public string CompanyName { get; set; }
-
-        //[JsonPropertyName("contactName")]
-        //public string ContactName { get; set; }
-
         [JsonPropertyName("MobileNumber")]
         public string MobileNumber { get; set; }
 
-        //[JsonPropertyName("country")]
-        //public string Country { get; set; }
-
-        //[JsonPropertyName("companySize")]
-        //public string CompanySize { get; set; }
-
-        //[JsonPropertyName("industry")]
-        //public string Industry { get; set; }
         [JsonPropertyName("FullName")]
         public string FullName { get; set; }
+
         [JsonPropertyName("IsActive")]
         public bool IsActive { get; set; }
+
+        // Required by IResponseModel
+        public bool IsSuccess { get; set; }
+        public string? Message { get; set; }
     }
 
-    public class LoginResponseModel : BaseResponseModel
+    public class LoginResponseModel : IResponseModel
     {
-
         [JsonPropertyName("token")]
         public string Token { get; set; }
-
+        public bool IsSuccess { get; set; }
+        public string Message { get; set; }
     }
 
     public class RegisterResponseModel : BaseResponseModel

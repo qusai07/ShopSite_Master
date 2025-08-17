@@ -1,9 +1,10 @@
 @page "/profile"
 @inject Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage.ProtectedSessionStorage ProtectedSessionStorage
 @inject NavigationManager NavigationManager
-@inject IAuthenticationService AuthService
+@inject ShopSite_Master.Services.Master.UserService UserService;
+@inject ShopSite_Master.Services.Interfaces.IAuthenticationService AuthService;
 @inject ILogger<Profile> Logger
-@using MyShop_Site.Services
+@attribute [Authorize]
 @using MyShop_Site.Models.ResponseModels
 
 <PageTitle>Profile - MyShop</PageTitle>
@@ -45,9 +46,9 @@
                                 </div>
 
                                 @*<div class="mb-3">
-                                    <label class="form-label fw-bold">Company:</label>
-                                    <p class="form-control-plaintext">@userInfo.CompanyName</p>
-                                </div>*@
+                                        <label class="form-label fw-bold">Company:</label>
+                                        <p class="form-control-plaintext">@userInfo.CompanyName</p>
+                                    </div>*@
 
                                 @if (!string.IsNullOrEmpty(loginTime))
                                 {
@@ -73,23 +74,23 @@
                             <button class="btn btn-danger" @onclick="Logout" disabled="@isLoggingOut">
                                 @if (isLoggingOut)
                                 {
-                                    <span class="spinner-border spinner-border-sm me-2">Signing out...</span> 
-                                                }
+                                    <span class="spinner-border spinner-border-sm me-2">Signing out...</span>
+                                }
                                 else
                                 {
-                            <i class="fas fa-sign-out-alt me-2">Logout</i>
-                                                }
+                                    <i class="fas fa-sign-out-alt me-2">Logout</i>
+                                }
                             </button>
 
                             <button class="btn btn-outline-primary" @onclick="RefreshData" disabled="@isRefreshing">
                                 @if (isRefreshing)
                                 {
-                                    <span class="spinner-border spinner-border-sm me-2">Refreshing...</span> 
-                                                }
+                                    <span class="spinner-border spinner-border-sm me-2">Refreshing...</span>
+                                }
                                 else
                                 {
-                            <i class="fas fa-sync-alt me-2">Refresh Data</i>
-                                                }
+                                    <i class="fas fa-sync-alt me-2">Refresh Data</i>
+                                }
                             </button>
                         </div>
                     }
@@ -111,57 +112,57 @@
 </div>
 
 @code {
-    private bool isLoading = true;
-    private bool isLoggingOut = false;
-    private bool isRefreshing = false;
-    private bool isAuthenticated = false;
-    private string loginTime = string.Empty;
-    private UserInfoResponseModel? userInfo;
+            private bool isLoading = true;
+            private bool isLoggingOut = false;
+            private bool isRefreshing = false;
+            private bool isAuthenticated = false;
+            private string loginTime = string.Empty;
+            private UserInfoResponseModel? userInfo;
 
-    protected override async Task OnInitializedAsync()
-    {
-        await LoadProfileData();
-    }
-
-    private async Task LoadProfileData()
-    {
-        try
-        {
-            isLoading = true;
-            isAuthenticated = await AuthService.IsAuthenticatedAsync();
-
-            if (!isAuthenticated)
+            protected override async Task OnInitializedAsync()
             {
-                NavigationManager.NavigateTo("/login");
-                return;
+                await LoadProfileData();
             }
 
-            // Get login time
-            var loginTimeResult = await ProtectedSessionStorage.GetAsync<string>("login_time");
-            if (loginTimeResult.Success && !string.IsNullOrEmpty(loginTimeResult.Value))
+            private async Task LoadProfileData()
             {
-                if (DateTime.TryParse(loginTimeResult.Value, out var parsedTime))
+                try
                 {
-                    loginTime = parsedTime.ToString("yyyy-MM-dd HH:mm:ss UTC");
-                }
-            }
+                    isLoading = true;
+                    isAuthenticated = await AuthService.IsAuthenticatedAsync();
 
-            // Get user info
-            var userInfoResult = await ProtectedSessionStorage.GetAsync<UserInfoResponseModel>("user_info");
-            if (userInfoResult.Success)
-            {
-                userInfo = userInfoResult.Value;
-            }
+                    if (!isAuthenticated)
+                    {
+                        NavigationManager.NavigateTo("/login");
+                        return;
+                    }
 
-            // If not found in session, load from API
-            if (userInfo == null)
-            {
-                userInfo = await AuthService.GetCurrentUserAsync();
-                if (userInfo != null)
-                {
-                    await ProtectedSessionStorage.SetAsync("user_info", userInfo);
-                }
-            }
+                    // Get login time
+                    var loginTimeResult = await ProtectedSessionStorage.GetAsync<string>("login_time");
+                    if (loginTimeResult.Success && !string.IsNullOrEmpty(loginTimeResult.Value))
+                    {
+                        if (DateTime.TryParse(loginTimeResult.Value, out var parsedTime))
+                        {
+                            loginTime = parsedTime.ToString("yyyy-MM-dd HH:mm:ss UTC");
+                        }
+                    }
+
+                    //// Get user info
+                    //var userInfoResult = await ProtectedSessionStorage.GetAsync<UserInfoResponseModel>("user_info");
+                    //if (userInfoResult.Success)
+                    //{
+                    //    userInfo = userInfoResult.Value;
+                    //}
+
+                    // If not found in session, load from API
+                    //if (userInfo == null)
+                    //{
+                    userInfo = await UserService.GetProfileAsync();
+                    if (userInfo != null)
+                    {
+                        await ProtectedSessionStorage.SetAsync("user_info", userInfo);
+                    }
+                
         }
         catch (Exception ex)
         {
@@ -172,7 +173,7 @@
         {
             isLoading = false;
             StateHasChanged();
-        }
+    }
     }
 
     private async Task Logout()
@@ -182,7 +183,7 @@
 
         try
         {
-            await AuthService.LogoutAsync();
+            await UserService.LogoutAsync();
             await ProtectedSessionStorage.DeleteAsync("login_time");
             await ProtectedSessionStorage.DeleteAsync("user_info");
 

@@ -1,9 +1,9 @@
-
+﻿
 @page "/login"
 @using Microsoft.AspNetCore.Components.Authorization
-@using MyShop_Site.Services
-@inject IAuthenticationService AuthService
+@inject ShopSite_Master.Services.Interfaces.IAuthenticationService AuthService
 @inject NavigationManager Navigation
+
 
 <PageTitle>Login - MyShop</PageTitle>
 
@@ -59,34 +59,27 @@
 
                     <div class="text-center">
                         <p class="mb-0">Don't have an account? <a href="/register" class="text-decoration-none">Sign up here</a></p>
-                    </div>                
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
-</div>
-    </div>
-    </div>
 @code {
-    private MyShop_Site.Models.Common.LoginRequestModel loginModel = new ();
-    private string errorMessage = string.Empty;
+    private MyShop_Site.Models.Common.LoginRequestModel loginModel = new();
+    private string errorMessage = "";
     private bool showPassword = false;
     private bool isLoading = false;
 
     private async Task HandleLogin()
     {
         isLoading = true;
-        errorMessage = string.Empty;
+        errorMessage = "";
 
         try
-        {
-            var result = await AuthService.AuthenticateAsync(loginModel.Username, loginModel.Password, false);
-            if (result.IsSuccess)
-            {
-                Navigation.NavigateTo("/profile");
-            }
-            else
-            {
-                errorMessage = result.Message ?? "Invalid username or password.";
-            }
+                {
+            var url = $"/dologin?username={loginModel.Username}&password={loginModel.Password}";
+            Navigation.NavigateTo(url, true);
         }
         catch (Exception ex)
         {
@@ -97,7 +90,6 @@
             isLoading = false;
         }
     }
-
     private void TogglePasswordVisibility()
     {
         showPassword = !showPassword;

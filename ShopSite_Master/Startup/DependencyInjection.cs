@@ -2,10 +2,13 @@
 {
     public static class DependencyInjection
     {
-        public static IServiceCollection AddApplicationServices(this IServiceCollection services)
+        public static IServiceCollection AddApplicationServices(this IServiceCollection services, IConfiguration config)
         {
             // Call the method defined in BusinessServiceModule
+            services.AddMyShopServices(config);
             services.AddBusinessServiceModule();
+            services.AddMyShopCors(config);
+
             return services;
         }
 

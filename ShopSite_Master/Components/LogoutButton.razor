@@ -1,7 +1,6 @@
-
 @using Microsoft.AspNetCore.Components.Authorization
-@using MyShop_Site.Services
-@inject IAuthenticationService AuthService
+@using ShopSite_Master.Services.Interfaces
+@inject ShopSite_Master.Services.Master.UserService UserService
 
 <AuthorizeView>
     <Authorized>
@@ -14,6 +13,6 @@
 @code {
     private async Task HandleLogout()
     {
-        await AuthService.LogoutAsync();
+        await UserService.LogoutAsync();
     }
 }

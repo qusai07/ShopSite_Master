@@ -3,9 +3,11 @@ using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage;
 using MyShop_Site.Repo.Implementations;
 using MyShop_Site.Repo.Interfaces;
-using MyShop_Site.Services;
 using MyShopSite.Repo.Implementations;
 using MyShopSite.Repo.Interfaces;
+using ShopSite_Master.Services.Implementations;
+using ShopSite_Master.Services.Interfaces;
+using ShopSite_Master.Services.Master;
 
 namespace MyShopSite.Startup
 {
@@ -29,11 +31,10 @@ namespace MyShopSite.Startup
             services.AddScoped<CustomAuthenticationStateProvider>();
             services.AddScoped<AuthenticationStateProvider>(
                 sp => sp.GetRequiredService<CustomAuthenticationStateProvider>());
+            services.AddScoped<ITokenService, TokenService>();
+
             services.AddScoped<IAuthenticationService, AuthenticationService>();
 
-
-            services.AddScoped<IJwtTokenService, JwtTokenService>();
-            services.AddScoped<IApiClient, ApiClient>();
 
 
             // Data protection
@@ -73,6 +74,8 @@ namespace MyShopSite.Startup
 
             // Master service
             services.AddScoped<MasterService>();
+
+            services.AddHttpContextAccessor();
 
 
             return services; 

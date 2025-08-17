@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
+using MyShop_Site.Models.Authentication;
 using MyShop_Site.Repo.Interfaces;
 using System;
 using System.Collections.Generic;
@@ -17,29 +18,33 @@ namespace MyShop_Site.Repo.Implementations
         private readonly IDataProtector _dataProtector;
         private readonly ILogger<SecureCookieService> _logger;
         private readonly IConfiguration _configuration;
+        private readonly IHttpContextAccessor _httpContextAccessor;
+
 
         public SecureCookieService(
             ProtectedLocalStorage protectedStorage,
             IDataProtectionProvider dataProtectionProvider,
             ILogger<SecureCookieService> logger,
-            IConfiguration configuration)
+            IConfiguration configuration, IHttpContextAccessor httpContextAccessor)
         {
             _protectedStorage = protectedStorage;
             _dataProtector = dataProtectionProvider.CreateProtector("MyShop.SecureCookies");
             _logger = logger;
-            _configuration = configuration;
+            _configuration = configuration; _httpContextAccessor = httpContextAccessor;
+
         }
-        public void SetTokenCookie(string token, int expireMinutes = 60)
+        public async Task SetTokenCookie(string token)
         {
             var options = new CookieOptions
             {
                 HttpOnly = true,       // JS can't read it
                 Secure = true,         // Only HTTPS
                 SameSite = SameSiteMode.Strict,
-                Expires = DateTime.UtcNow.AddMinutes(expireMinutes)
+                Expires = DateTime.UtcNow.AddMinutes(10)
             };
 
-            //_httpContextAccessor.HttpContext.Response.Cookies.Append("AuthToken", token, options);
+            _httpContextAccessor.HttpContext.Response.Cookies.Append("AuthToken", token, options);
+
         }
         public async Task SetSecureCookie(string key, string value)
         {
@@ -69,21 +74,29 @@ namespace MyShop_Site.Repo.Implementations
 
         public async Task<string?> GetCookie(string key)
         {
-            try
-            {
-                var result = await _protectedStorage.GetAsync<string>(key);
-                if (!result.Success || string.IsNullOrEmpty(result.Value))
-                    return null;
+            var token = _httpContextAccessor.HttpContext.Request.Cookies["access_token"];
 
-                return _dataProtector.Unprotect(result.Value);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogWarning(ex, "Error reading secure cookie: {CookieKey}", key);
-                await DeleteCookie(key);
-                return null;
-            }
+            return _httpContextAccessor.HttpContext?.Request.Cookies[key];
+
         }
+
+        //public async Task<string?> GetCookie(string key)
+        //{
+        //    try
+        //    {
+        //        var result = await _protectedStorage.GetAsync<string>(key);
+        //        if (!result.Success || string.IsNullOrEmpty(result.Value))
+        //            return null;
+
+        //        return _dataProtector.Unprotect(result.Value);
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        _logger.LogWarning(ex, "Error reading secure cookie: {CookieKey}", key);
+        //        await DeleteCookie(key);
+        //        return null;
+        //    }
+        //}
 
         public async Task<T?> GetCookie<T>(string key) where T : class
         {
@@ -117,11 +130,10 @@ namespace MyShop_Site.Repo.Implementations
 
         public async Task SetAuthenticationCookie(string userId, bool rememberMe = false)
         {
-            var authData = new AuthCookieData
+            var authData = new AuthenticationData
             {
-                UserId = userId,
                 IssuedAt = DateTime.UtcNow,
-                SessionId = Guid.NewGuid().ToString()
+                Token ="" //userId.token
             };
 
             var expiryDays = rememberMe ? 30 : 1;
@@ -188,12 +200,5 @@ namespace MyShop_Site.Repo.Implementations
             foreach (var cookie in cookiesToDelete)
                 await DeleteCookie(cookie);
         }
-    }
-
-    public class AuthCookieData
-    {
-        public string UserId { get; set; }
-        public DateTime IssuedAt { get; set; }
-        public string SessionId { get; set; }
     }
 }

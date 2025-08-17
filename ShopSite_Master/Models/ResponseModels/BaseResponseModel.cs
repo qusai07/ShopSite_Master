@@ -6,7 +6,7 @@ namespace MyShop_Site.Models.ResponseModels
     public interface IResponseModel
     {
         bool IsSuccess { get; set; }
-        string Message { get; set; }
+        string? Message { get; set; }
     }
 
     public class BaseResponseModel : IResponseModel
