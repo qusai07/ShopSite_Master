@@ -184,9 +184,6 @@
         try
         {
             await UserService.LogoutAsync();
-            await ProtectedSessionStorage.DeleteAsync("login_time");
-            await ProtectedSessionStorage.DeleteAsync("user_info");
-
             NavigationManager.NavigateTo("/login", forceLoad: true);
         }
         catch (Exception ex)

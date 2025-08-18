@@ -20,6 +20,8 @@
 
         }
         public async Task<IActionResult> OnGetAsync(string username , string password)
+        
+        
         {
             if (string.IsNullOrEmpty(username) || string.IsNullOrEmpty(password))
                 return Redirect("/login");

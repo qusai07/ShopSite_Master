@@ -196,9 +196,9 @@ namespace MyShop_Site.Repo.Implementations
 
         public async Task ClearAllAppCookies()
         {
-            var cookiesToDelete = new[] { "RememberMe", "ShoppingCart", "UserPreferences", "auth_session", "csrf_token" };
+            var cookiesToDelete = new[] { "AuthToken", "MyShop.Auth", "UserPreferences"};
             foreach (var cookie in cookiesToDelete)
                 await DeleteCookie(cookie);
         }
     }
-}
+};

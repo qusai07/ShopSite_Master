@@ -18,18 +18,17 @@ namespace ShopSite_Master.Services.Implementations
             _masterService = masterService;
         }
 
-        public async Task<AuthenticationResult> AuthenticateAsync(string userNameOrEmail, string password)
+        public async Task<AuthenticationResult> AuthenticateAsync(string UserName, string password)
         {
             using HttpClient httpClient = new HttpClient();
             var response = await httpClient.PostAsync(
-                "http://192.168.1.115:5300/SmartApp/api/Auth/Login",
-                JsonContent.Create(new { userNameOrEmail, password }));
+                "https://dev.minerets.com/ShopMaster/api/Authentication/Authenticate",
+                JsonContent.Create(new { UserName, password }));
 
             var content = await response.Content.ReadAsStringAsync();
 
             if (response.IsSuccessStatusCode)
             {
-                // السيرفر رجع الـ JWT مباشرة كنص
                 return new AuthenticationResult
                 {
                     IsSuccess = true,

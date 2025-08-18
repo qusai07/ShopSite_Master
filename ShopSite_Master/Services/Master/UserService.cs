@@ -78,7 +78,7 @@ namespace ShopSite_Master.Services.Master
         {
             try
             {
-                var profile = await _masterService.RequestMasterAsync<UserInfoResponseModel>("Auth/GetProfile");
+                var profile = await _masterService.RequestMasterAsync<UserInfoResponseModel>("User/GetUser");
                 return profile;
             }
             catch (Exception ex)
@@ -87,14 +87,10 @@ namespace ShopSite_Master.Services.Master
                 return null;
             }
         }
-
-
-
         public async Task LogoutAsync()
         {
             try
             {
-                // Update authentication state
                 await _authStateProvider.MarkUserAsLoggedOutAsync();
             }
             catch (Exception ex)
